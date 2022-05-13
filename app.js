@@ -27,12 +27,12 @@ Channels.setChannels([
         id: 'tablet',
         // Uz šo url sūta subscriber statusu (connect, disconnect)
         subscriberStatusUrl: [
-            'https://eoqz0h8uhdyx9lj.m.pipedream.net',
+            //'https://eoqz0h8uhdyx9lj.m.pipedream.net',
             'http://consents.darbs.xyz:8065/api/tablet/status',
         ],
         // Uz šo url sūta ienākošo message no subscriber
         subscriberMessageUrl: [
-            'https://eoqz0h8uhdyx9lj.m.pipedream.net',
+            //'https://eoqz0h8uhdyx9lj.m.pipedream.net',
             'http://consents.darbs.xyz:8065/api/tablet/message',
         ]
     },
@@ -40,12 +40,12 @@ Channels.setChannels([
         id: 'admin',
         // Uz šo url sūta subscriber statusu (connect, disconnect)
         subscriberStatusUrl: [
-            'https://eoqz0h8uhdyx9lj.m.pipedream.net',
+            //'https://eoqz0h8uhdyx9lj.m.pipedream.net',
             'http://consents.darbs.xyz:8065/api/tablet/status',
         ],
         // Uz šo url sūta ienākošo message no subscriber
         subscriberMessageUrl: [
-            'https://eoqz0h8uhdyx9lj.m.pipedream.net',
+            //'https://eoqz0h8uhdyx9lj.m.pipedream.net',
             'http://consents.darbs.xyz:8065/api/tablet/message',
         ]
     }
@@ -70,7 +70,7 @@ let server = http.createServer(function(request, response) {
         clients.notify(requestUrl.query.channel, requestUrl.query.message);
     }
     else if (requestUrl.pathname == '/subscriber/notify') {
-        clients.notifyByClient(requestUrl.query.channel, requestUrl.query.client, requestUrl.query.message);
+        clients.notifyByClient(requestUrl.query.channel, requestUrl.query.client, requestUrl.query.message, requestUrl.query.payload);
     }
     // Klienta connection status
     else if (requestUrl.pathname == '/subscriber/status') {

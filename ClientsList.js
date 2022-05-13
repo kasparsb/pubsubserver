@@ -27,7 +27,10 @@ ClientsList.prototype = {
         client.disconnectAt = timer();
     },
 
-    notify(channel, message) {
+    notify(channel, message, payload) {
+        if (typeof payload == 'undefined') {
+            payload = null;
+        }
         this.clients
             .filter(subscriber => subscriber.channel == channel)
             .filter(subscriber => subscriber.connection.connected)
@@ -35,12 +38,12 @@ ClientsList.prototype = {
                 subscriber.connection.sendUTF(JSON.stringify({
                     type: 'message',
                     message: message,
-                    payload: null
+                    payload: typeof payload == 'undefined' ? null : payload
                 }));
             })
     },
 
-    notifyByClient(channel, client, message) {
+    notifyByClient(channel, client, message, payload) {
         this.clients
             .filter(subscriber => subscriber.channel == channel)
             .filter(subscriber => subscriber.data.client == client)
@@ -49,7 +52,7 @@ ClientsList.prototype = {
                 subscriber.connection.sendUTF(JSON.stringify({
                     type: 'message',
                     message: message,
-                    payload: null
+                    payload: payload
                 }))
             })
     },
