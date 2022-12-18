@@ -17,8 +17,8 @@ function send(url, data, tries) {
         return;
     }
 
-    console.log('send');
-    console.log(data);
+    //console.log('notify url '+url);
+    //console.log(data);
     axios.post(url, data)
         .catch(err => {
             setTimeout(() => send(url, data, tries+1), 500)
@@ -36,6 +36,7 @@ function forEachUrl(channelId, urlName, cb) {
 }
 
 function notify(channelId, urlName, data) {
+    console.log('notify channel: '+channelId+' '+urlName);
     forEachUrl(channelId, urlName, url => {
         send(url, data)
     })

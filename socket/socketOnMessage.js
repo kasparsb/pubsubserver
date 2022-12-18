@@ -20,13 +20,11 @@ function socketOnMessage(client, message) {
     if (client.disconnectAt) {
         disconnectDuration = 'disc dur '+(new Date()).getTime() - client.disconnectAt;
     }
-    console.log('client '+disconnectDuration+' | '+client.data.client+' message', message.utf8Data);
 
     client.lastMessageAt = timer();
 
     let data = null;
 
-    console.log(message.utf8Data);
     try {
         data = JSON.parse(message.utf8Data);
     }
@@ -35,6 +33,7 @@ function socketOnMessage(client, message) {
     }
 
     if (data.type == 'ping') {
+        //console.log('PING '+client.data?.client+'@'+client.channel);
         /**
          * Ja connections uzrādās, ka disconnected, tad nesūtām pong
          * Ir mirkļi, kad connection uzrādās kā false, bet klienta puse mierīgi
@@ -49,6 +48,7 @@ function socketOnMessage(client, message) {
         //}
     }
     else if (data.type == 'message') {
+        console.log('MESSAGE '+client.data?.client+'@'+client.channel+' '+data.message);
         Channels.notifyMessage(client.channel, client.data, data.message);
     }
 }

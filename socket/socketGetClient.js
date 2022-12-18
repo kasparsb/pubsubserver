@@ -12,6 +12,8 @@ function socketGetClient(request, connection) {
         }
     );
 
+    console.log('CONNECTED '+client.data?.client+'@'+client.channel);
+
     Channels.notifyStatus(client.channel, client.data, 'connect');
 
     return client;
