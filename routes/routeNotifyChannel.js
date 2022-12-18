@@ -1,7 +1,7 @@
-let Channels = require('../Channels');
+let ClientsList = require('../ClientsList');
 
 function routeNotifyChannel(query, writeResponse) {
-    Channels.notifyMessage(query.channel, query.message);
+    ClientsList.notify(query.channel, query.message);
 }
 
 module.exports = routeNotifyChannel
