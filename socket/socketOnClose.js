@@ -2,7 +2,6 @@ let ClientsList = require('../ClientsList')
 let Channels = require('../Channels')
 
 function socketOnClose(client, reasonCode, description) {
-    console.log('client ' + client.data.client + ' disconnected.');
 
     /**
      * Liekam pazīmi, ka disconnected
@@ -14,6 +13,6 @@ function socketOnClose(client, reasonCode, description) {
      */
     ClientsList.disconnect(client);
 
-    Channels.notifyStatus(client.channel, client.data, 'disconnect');
+    Channels.notifySubscriberStatusChange(client.channel, client.data, 'disconnect');
 }
 module.exports = socketOnClose;

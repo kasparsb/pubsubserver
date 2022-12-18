@@ -49,7 +49,7 @@ function socketOnMessage(client, message) {
     }
     else if (data.type == 'message') {
         console.log('MESSAGE '+client.data?.client+'@'+client.channel+' '+data.message);
-        Channels.notifyMessage(client.channel, client.data, data.message);
+        Channels.notifySubscriberMessageRecieved(client.channel, client.data, data.message);
     }
 }
 module.exports = socketOnMessage;

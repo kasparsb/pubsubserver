@@ -35,13 +35,6 @@ function forEachUrl(channelId, urlName, cb) {
     }
 }
 
-function notify(channelId, urlName, data) {
-    console.log('notify channel: '+channelId+' '+urlName);
-    forEachUrl(channelId, urlName, url => {
-        send(url, data)
-    })
-}
-
 function loadFromDb(done) {
     Mysql.getRows('select * from channels', [], function(rows){
 
@@ -72,16 +65,29 @@ function loadFromDb(done) {
     });
 }
 
+/**
+ * Send message to channel listener
+ */
+function notifyListener(channelId, urlName, data) {
+    console.log('notify channel listener: '+channelId+' '+urlName);
+    forEachUrl(channelId, urlName, url => {
+        send(url, data)
+    })
+}
+
 module.exports = {
     loadFromDb: loadFromDb,
-    notifyMessage(channel, subscriberData, message) {
-        notify(channel, 'subscriberMessageRecieved', {
+    /**
+     * Notify channel listener about message from subscriber
+     */
+    notifySubscriberMessageRecieved(channel, subscriberData, message) {
+        notifyListener(channel, 'subscriberMessageRecieved', {
             message: message,
             subscriber: subscriberData
         });
     },
-    notifyStatus(channel, subscriberData, status) {
-        notify(channel, 'subscriberStatusChange', {
+    notifySubscriberStatusChange(channel, subscriberData, status) {
+        notifyListener(channel, 'subscriberStatusChange', {
             status: status,
             subscriber: subscriberData
         });
