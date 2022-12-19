@@ -3,10 +3,6 @@
  */
 let Mysql = require('./Mysql');
 
-let WebSocket = require('websocket');
-let http = require('http');
-let url = require('url');
-//let axios = require('axios');
 let ClientsList = require('./ClientsList')
 let Channels = require('./Channels');
 let timer = require('./timer');
@@ -40,12 +36,11 @@ function startServer() {
 
     ClientsList.removeInactiveEverySeconds(10);
 
+    Route.default(routeDefault)
     Route.get('/channel/notify', routeNotifyChannel)
     Route.get('/subscriber/notify', routeNotifySubscriber)
     Route.get('/subscriber/status', routeGetSubscriberStatus)
     Route.get('/log', routeShowLog)
-    // Route which responds to any not defined route
-    Route.default(routeDefault)
 
     let server = createServer(port, '0.0.0.0', Route.all())
 

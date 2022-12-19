@@ -1,6 +1,8 @@
 let ClientsList = require('../ClientsList')
 let Channels = require('../Channels')
 
+let messageStatus = require('../message/status');
+
 function socketOnClose(client, reasonCode, description) {
 
     /**
@@ -13,6 +15,9 @@ function socketOnClose(client, reasonCode, description) {
      */
     ClientsList.disconnect(client);
 
-    Channels.notifySubscriberStatusChange(client.channel, client.data, 'disconnect');
+    Channels.notifySubscriberStatusChange(
+        client.channel,
+        messageStatus('disconnect', client)
+    );
 }
 module.exports = socketOnClose;

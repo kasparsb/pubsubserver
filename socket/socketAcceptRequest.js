@@ -1,3 +1,5 @@
+let Channels = require('../Channels')
+
 function socketAcceptRequest(request) {
     /**
      * @todo pašlaik visas connection accept

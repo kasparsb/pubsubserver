@@ -30,6 +30,7 @@ function callConsoleCommand(command, args) {
 
     if (typeof commands[command] == 'undefined') {
         console.log('This command '+command+' is not registered');
+        allDone();
     }
     else {
         // Pieslēdzamie pie DB un izsaucam komandu

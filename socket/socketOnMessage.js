@@ -1,6 +1,9 @@
 let Channels = require('../Channels');
 let timer = require('../timer');
 
+let messagePong = require('../message/pong');
+let messageMessage = require('../message/message');
+
 /**
  * Apstrādājam ienākošo socket message no client
  *
@@ -42,14 +45,17 @@ function socketOnMessage(client, message) {
          */
         //if (client.connection.connected) {  Patestējam, kā būs ja sūtīs ping arī tam, kas nav connected
             // Atbildam ar pong
-            client.connection.sendUTF(JSON.stringify({
-                type: 'pong'
-            }));
+            client.connection.sendUTF(JSON.stringify(messagePong()));
         //}
     }
     else if (data.type == 'message') {
         console.log('MESSAGE '+client.data?.client+'@'+client.channel+' '+data.message);
-        Channels.notifySubscriberMessageRecieved(client.channel, client.data, data.message);
+
+        Channels.notifySubscriberMessageRecieved(
+            // Channel name
+            client.channel,
+            messageMessage(data.message, undefined, client)
+        );
     }
 }
 module.exports = socketOnMessage;

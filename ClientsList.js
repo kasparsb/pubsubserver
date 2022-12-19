@@ -2,10 +2,17 @@ let timer = require('./timer');
 
 let clients = []
 
-function add(channel, connection, data) {
+function add(channel, connection, data, ip, socketVersion) {
+
+    // Unset channel from client data
+    delete data.channel;
+
     let client = {
         connection: connection,
         channel: channel,
+        ip: ip,
+        socketVersion: socketVersion,
+        // Tas ko klients iesūtījis pieslēdzoties
         data: data,
         disconnectAt: null,
         lastMessageAt: null
@@ -16,41 +23,32 @@ function add(channel, connection, data) {
     return client;
 }
 
-function findByClient(id) {
-    return clients.find(client => client.data.client == id);
+function findByClient(subscriberName) {
+    return clients.find(client => client.data.client == subscriberName);
 }
 
 function disconnect(client) {
     client.disconnectAt = timer();
 }
 
-function notify(channel, message, payload) {
-    if (typeof payload == 'undefined') {
-        payload = null;
-    }
+function notify(channelName, message) {
     clients
-        .filter(subscriber => subscriber.channel == channel)
+        .filter(subscriber => subscriber.channel == channelName)
         .filter(subscriber => subscriber.connection.connected)
         .forEach(subscriber => {
-            subscriber.connection.sendUTF(JSON.stringify({
-                type: 'message',
-                message: message,
-                payload: typeof payload == 'undefined' ? null : payload
-            }));
+            console.log(message);
+            subscriber.connection.sendUTF(JSON.stringify(message));
         })
 }
 
-function notifyByClient(channel, client, message, payload) {
+function notifyBySubscriber(channelName, subscriberName, message) {
     clients
-        .filter(subscriber => subscriber.channel == channel)
-        .filter(subscriber => subscriber.data.client == client)
+        .filter(subscriber => subscriber.channel == channelName)
+        .filter(subscriber => subscriber.data.client == subscriberName)
         .filter(subscriber => subscriber.connection.connected)
         .forEach(subscriber => {
-            subscriber.connection.sendUTF(JSON.stringify({
-                type: 'message',
-                message: message,
-                payload: payload
-            }))
+            console.log(message);
+            subscriber.connection.sendUTF(JSON.stringify(message))
         })
 }
 
@@ -70,7 +68,7 @@ function removeInactive() {
 module.exports = {
     add: add,
     notify: notify,
-    notifyByClient: notifyByClient,
+    notifyBySubscriber: notifyBySubscriber,
     disconnect: disconnect,
     findByClient: findByClient,
     // Intervāls kādā izvākt inactive
