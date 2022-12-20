@@ -1,5 +1,6 @@
 let Mysql = require('../Mysql');
 let createArray = require('./createArray');
+let createBoolean = require('./createBoolean');
 
 function loadChannelsFromDb(cb) {
 
@@ -31,6 +32,9 @@ function loadChannelsFromDb(cb) {
             if (typeof row.subscriber_notify?.subscriberMessageRecieved != 'undefined') {
                 channel.subscriberNotify.subscriberMessageRecieved = row.subscriber_notify.subscriberMessageRecieved;
             }
+
+            channel.subscriberNotify.subscriberStatusChange = createBoolean(channel.subscriberNotify.subscriberStatusChange);
+            channel.subscriberNotify.subscriberMessageRecieved = createBoolean(channel.subscriberNotify.subscriberMessageRecieved);
 
             return channel;
         })

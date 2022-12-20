@@ -17,6 +17,7 @@ let routeGetSubscriberStatus = require('./routes/routeGetSubscriberStatus');
 let routeNotifyChannel = require('./routes/routeNotifyChannel');
 let routeNotifySubscriber = require('./routes/routeNotifySubscriber');
 let routeShowLog = require('./routes/routeShowLog');
+let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
 
 // Socket actions
 let socketAcceptRequest = require('./socket/socketAcceptRequest');
@@ -37,6 +38,7 @@ function startServer() {
     ClientsList.removeInactiveEverySeconds(10);
 
     Route.default(routeDefault)
+    Route.post('/channels/updated', routeChannelsUpdated)
     Route.get('/channel/notify', routeNotifyChannel)
     Route.get('/subscriber/notify', routeNotifySubscriber)
     Route.get('/subscriber/status', routeGetSubscriberStatus)
