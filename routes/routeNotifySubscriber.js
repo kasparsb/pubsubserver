@@ -1,7 +1,7 @@
 let ClientsList = require('../ClientsList')
 let messageMessage = require('../message/message');
 
-function routeNotifySubscriber(query, writeResponse) {
+function routeNotifySubscriber(query, writeResponse, routeCompleted) {
     ClientsList.notifyBySubscriber(
         // Channel name
         query.channel,
@@ -10,6 +10,8 @@ function routeNotifySubscriber(query, writeResponse) {
         // app server message, tāpēc netiek padots sender
         messageMessage(query.message, query.payload)
     );
+
+    routeCompleted();
 }
 
 module.exports = routeNotifySubscriber

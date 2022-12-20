@@ -7,15 +7,24 @@ function handleRequest(request, response, routes) {
 
     let route = routes.match(request.method, requestUrl.pathname);
 
+    // max execution time
+    let requestTimeout = setTimeout(function(){
+        response.write('request timed out');
+        response.end();
+    }, 5000)
+
     route(
         requestUrl.query,
         // Callback for writing to response
         function(responseData){
             response.write(responseData)
+        },
+        // When route done its job
+        function(){
+            clearTimeout(requestTimeout);
+            response.end();
         }
     )
-
-    response.end();
 }
 
 function createServer(port, listenIp, routes) {

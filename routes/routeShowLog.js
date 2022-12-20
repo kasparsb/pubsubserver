@@ -1,6 +1,6 @@
 let ClientsList = require('../ClientsList')
 
-function routeShowLog(query, writeResponse) {
+function routeShowLog(query, writeResponse, routeCompleted) {
     ClientsList.clients.forEach(client => {
 
         //if (!client.connection.connected || client.disconnectAt) {
@@ -30,6 +30,8 @@ function routeShowLog(query, writeResponse) {
             client.connection.remoteAddress+' '+
             '\n'
         );
+
+        routeCompleted();
     })
 }
 
