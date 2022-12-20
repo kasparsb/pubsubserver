@@ -1,11 +1,5 @@
 let mysql = require('mysql2');
-let connection = mysql.createConnection({
-    host: '192.168.2.1',
-    user: 'root',
-    password: 'bbbbbbbb',
-    database: 'pubsub',
-    port: 3371
-});
+let connection = false;
 
 let isConnected = false;
 
@@ -43,14 +37,28 @@ function getRows(sql, values, cb) {
 }
 
 function connect(successCb) {
-    connection.connect(function(err){
-        if (err) {
-            console.log(err);
-        }
-        else {
-            successCb();
-        }
+    connection = mysql.createConnection({
+        host: '192.168.2.1',
+        user: 'root',
+        password: 'bbbbbbbb',
+        database: 'pubsub',
+        port: 3371
     });
+
+    /**
+     * mysql2 pats veic connect. tikai nevar saprast kurā mirklī
+     * vai createConnection vai query laikā
+     */
+    successCb();
+
+    // connection.connect(function(err){
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     else {
+    //         successCb();
+    //     }
+    // });
 }
 
 function disconnect() {
