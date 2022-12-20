@@ -2,8 +2,6 @@
  * from command line run
  * node cli.js namespace:command arg1 arg2 ...
  */
-let Mysql = require('./Mysql');
-
 let consoleChannelsCreate = require('./console/consoleChannelsCreate');
 let consoleChannelsShow = require('./console/consoleChannelsShow');
 
@@ -18,12 +16,8 @@ let command = process.argv[2];
 
 callConsoleCommand(command, process.argv.slice(3));
 
-
-/**
- * Kad visas darbības beigas
- */
 function allDone() {
-    Mysql.disconnect();
+
 }
 
 function callConsoleCommand(command, args) {
@@ -33,12 +27,8 @@ function callConsoleCommand(command, args) {
         allDone();
     }
     else {
-        // Pieslēdzamie pie DB un izsaucam komandu
-        Mysql.connect(function(){
 
-            commands[command](args, allDone)
-
-        });
+        commands[command](args, allDone)
 
     }
 }
