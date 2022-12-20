@@ -2,6 +2,7 @@ let axios = require('axios');
 let ClientsList = require('./ClientsList')
 
 let loadChannelsFromDb = require('./helpers/loadChannelsFromDb');
+let dumpChannels = require('./helpers/dumpChannels');
 
 let channelStructure = {
     name: '',
@@ -37,8 +38,6 @@ function send(url, message, tries) {
         return;
     }
 
-    console.log(message);
-
     axios.post(url, message)
         .catch(err => {
             setTimeout(() => send(url, message, tries+1), 500)
@@ -50,6 +49,8 @@ function loadFromDb(done) {
 
         channels = data;
 
+        dumpChannels(channels);
+
         done();
     })
 }
@@ -58,8 +59,6 @@ function loadFromDb(done) {
  * Send message to channel listener
  */
 function notifyListeners(channelName, eventName, message) {
-    console.log('notify channel listeners: '+channelName+' '+eventName);
-
     let channel = channels.find(channel => channel.name == channelName);
 
     if (!channel) {

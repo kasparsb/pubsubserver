@@ -48,14 +48,12 @@ function connect(successCb) {
             console.log(err);
         }
         else {
-            console.log('connected to mysql');
             successCb();
         }
     });
 }
 
 function disconnect() {
-    console.log('disconnected from Mysql');
     connection.end();
 }
 

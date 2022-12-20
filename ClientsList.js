@@ -36,7 +36,6 @@ function notify(channelName, message) {
         .filter(subscriber => subscriber.channel == channelName)
         .filter(subscriber => subscriber.connection.connected)
         .forEach(subscriber => {
-            console.log(message);
             subscriber.connection.sendUTF(JSON.stringify(message));
         })
 }
@@ -47,7 +46,6 @@ function notifyBySubscriber(channelName, subscriberName, message) {
         .filter(subscriber => subscriber.data.client == subscriberName)
         .filter(subscriber => subscriber.connection.connected)
         .forEach(subscriber => {
-            console.log(message);
             subscriber.connection.sendUTF(JSON.stringify(message))
         })
 }
