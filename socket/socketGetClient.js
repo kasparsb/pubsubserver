@@ -14,7 +14,7 @@ function socketGetClient(request, connection) {
         connection.webSocketVersion
     );
 
-    console.log('CONNECTED '+client.data?.client+'@'+client.channel);
+    console.log('CONNECTED '+client.data.client+'@'+client.channel);
 
     Channels.notifySubscriberStatusChange(
         client.channel,

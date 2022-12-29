@@ -8,8 +8,16 @@ function loadChannelsFromDb(cb) {
 
             let channels = rows.map(function(row){
 
-                row.listener_notify_endpoints = JSON.parse(row.listener_notify_endpoints);
-                row.subscriber_notify = JSON.parse(row.subscriber_notify);
+                /**
+                 * @todo Kāpēc uz prod servera šeit nāk atpakaļ jau JSON
+                 * bet uz dev servera string
+                 */
+                if (typeof row.listener_notify_endpoints == 'string') {
+                    row.listener_notify_endpoints = JSON.parse(row.listener_notify_endpoints);
+                }
+                if (typeof row.subscriber_notify == 'string') {
+                    row.subscriber_notify = JSON.parse(row.subscriber_notify);
+                }
 
                 let channel = {
                     id: row.id,
@@ -26,10 +34,10 @@ function loadChannelsFromDb(cb) {
                     }
                 }
 
-                if (typeof row.subscriber_notify?.subscriberStatusChange != 'undefined') {
+                if (typeof row.subscriber_notify.subscriberStatusChange != 'undefined') {
                     channel.subscriberNotify.subscriberStatusChange = row.subscriber_notify.subscriberStatusChange;
                 }
-                if (typeof row.subscriber_notify?.subscriberMessageRecieved != 'undefined') {
+                if (typeof row.subscriber_notify.subscriberMessageRecieved != 'undefined') {
                     channel.subscriberNotify.subscriberMessageRecieved = row.subscriber_notify.subscriberMessageRecieved;
                 }
 
