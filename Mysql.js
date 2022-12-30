@@ -1,9 +1,10 @@
 let mysql = require('mysql2');
-let connection = false;
+let formatDate = require('./helpers/formatDate');
 
+let connection = false;
 let isConnected = false;
 
-function insert(tableName, data) {
+function insert(tableName, data, cb) {
     let fields = [];
     let values = [];
     let valuesPlaceholders = [];
@@ -19,13 +20,64 @@ function insert(tableName, data) {
     }
 
     let sql = 'INSERT INTO '+connection.escapeId(tableName)+' ('+fields.join(',')+') VALUES ('+valuesPlaceholders+')';
-    query(sql, values);
+    query(sql, values, function(results){
+        cb(results.insertId);
+    });
 }
 
-function query(sql, values) {
-    connection.query(sql, values, function(err){
+function update(tableName, data, where, cb) {
+    let fields = [];
+    let values = [];
+    // Loop through data props
+    for (let field in data) {
+        fields.push(field+'=?');
+        let value = data[field];
+        if (typeof  data[field] == 'object') {
+           value = JSON.stringify(value);
+        }
+        values.push(value);
+    }
+    // Where
+    let qw = [];
+    for (let field in where) {
+        qw.push(field+'=?');
+        values.push(where[field]);
+    }
+
+    let sql = 'UPDATE '+connection.escapeId(tableName)+' SET '+fields+' WHERE '+qw.join(' AND ');
+    query(sql, values, cb);
+}
+
+function insertOrUpdate(tableName, data, where, cb) {
+    let qw = [];
+    let qwv = []
+    for (let field in where) {
+        qw.push(field+'=?');
+        qwv.push(where[field]);
+    }
+    qw = 'select id from '+connection.escapeId(tableName)+' where '+qw.join(' AND ');
+    connection.query(qw, qwv, function(err, rows){
         if (err) {
             console.log(err.sqlMessage);
+            return;
+        }
+
+        if (rows.length > 0) {
+            update(tableName, data, where, cb)
+        }
+        else {
+            insert(tableName, data, cb)
+        }
+    });
+}
+
+function query(sql, values, cb) {
+    connection.query(sql, values, function(err, results){
+        if (err) {
+            console.log(err.sqlMessage);
+        }
+        if (cb) {
+            cb(results);
         }
     });
 }
@@ -68,6 +120,12 @@ function disconnect() {
 module.exports = {
     query: query,
     insert: insert,
+    update: update,
+    insertOrUpdate: insertOrUpdate,
+    now: function(){
+        //return mysql.raw('CURRENT_TIMESTAMP()')
+        return formatDate.ymdhis(new Date())
+    },
     getRows: getRows,
     connect: connect,
     disconnect: disconnect
