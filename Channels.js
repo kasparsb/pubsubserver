@@ -55,11 +55,15 @@ function loadFromDb(done) {
     })
 }
 
+function findChannel(channelName) {
+    return channels.find(channel => channel.name == channelName);
+}
+
 /**
  * Send message to channel listener
  */
 function notifyListeners(channelName, eventName, message) {
-    let channel = channels.find(channel => channel.name == channelName);
+    let channel = findChannel(channelName);
 
     if (!channel) {
         return;
@@ -81,15 +85,16 @@ function notifyListeners(channelName, eventName, message) {
 }
 
 module.exports = {
+    get: findChannel,
     loadFromDb: loadFromDb,
     /**
      * Notify channel listener about message from subscriber
      */
-    notifySubscriberMessageRecieved(channelName, messageMessage) {
-        notifyListeners(channelName, 'subscriberMessageRecieved', messageMessage);
+    notifySubscriberMessageRecieved(channel, messageMessage) {
+        notifyListeners(channel.name, 'subscriberMessageRecieved', messageMessage);
     },
-    notifySubscriberStatusChange(channelName, messageStatus) {
-        notifyListeners(channelName, 'subscriberStatusChange', messageStatus);
+    notifySubscriberStatusChange(channel, messageStatus) {
+        notifyListeners(channel.name, 'subscriberStatusChange', messageStatus);
     },
     getChannels: function(){
         return channels;

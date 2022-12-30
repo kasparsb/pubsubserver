@@ -4,8 +4,14 @@ let Channels = require('../Channels')
 let messageStatus = require('../message/status');
 
 function socketGetClient(request, connection) {
-    let client = ClientsList.add(
-        request.resourceURL.query.channel,
+    let channel = Channels.get(request.resourceURL.query.channel);
+
+    if (!channel) {
+        console.log('Channel not found '+request.resourceURL.query.channel);
+    }
+
+    let subscriber = ClientsList.connect(
+        channel,
         connection,
         {
             ...request.resourceURL.query
@@ -14,13 +20,13 @@ function socketGetClient(request, connection) {
         connection.webSocketVersion
     );
 
-    console.log('CONNECTED '+client.data.client+'@'+client.channel);
+    console.log('CONNECTED '+subscriber.data.client+'@'+subscriber.channel.name);
 
     Channels.notifySubscriberStatusChange(
-        client.channel,
-        messageStatus('connect', client)
+        subscriber.channel,
+        messageStatus('connect', subscriber)
     );
 
-    return client;
+    return subscriber;
 }
 module.exports = socketGetClient;
