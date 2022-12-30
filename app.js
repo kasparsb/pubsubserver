@@ -1,6 +1,8 @@
 /**
  * run npx supervisor app.js
  */
+let Mysql = require('./Mysql');
+
 let ClientsList = require('./ClientsList')
 let Channels = require('./Channels');
 let timer = require('./timer');
@@ -25,7 +27,9 @@ let socketOnClose = require('./socket/socketOnClose');
 
 const port = 70;
 
-Channels.loadFromDb(startServer)
+Mysql.connect(function(){
+    Channels.loadFromDb(startServer)
+})
 
 function startServer() {
 
