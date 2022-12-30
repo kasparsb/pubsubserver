@@ -1,4 +1,5 @@
 let Channels = require('../Channels');
+let ClientsList = require('../ClientsList');
 let timer = require('../timer');
 
 let messagePong = require('../message/pong');
@@ -19,11 +20,6 @@ let messageMessage = require('../message/message');
  * }
  */
 function socketOnMessage(client, message) {
-    let disconnectDuration = '';
-    if (client.disconnectAt) {
-        disconnectDuration = 'disc dur '+(new Date()).getTime() - client.disconnectAt;
-    }
-
     client.lastMessageAt = timer();
 
     let data = null;
@@ -36,7 +32,6 @@ function socketOnMessage(client, message) {
     }
 
     if (data.type == 'ping') {
-        //console.log('PING '+client.data?.client+'@'+client.channel);
         /**
          * Ja connections uzrādās, ka disconnected, tad nesūtām pong
          * Ir mirkļi, kad connection uzrādās kā false, bet klienta puse mierīgi
@@ -46,11 +41,12 @@ function socketOnMessage(client, message) {
         //if (client.connection.connected) {  Patestējam, kā būs ja sūtīs ping arī tam, kas nav connected
             // Atbildam ar pong
             client.connection.sendUTF(JSON.stringify(messagePong()));
+            ClientsList.setSubscriberStatusPong(client);
         //}
+
+
     }
     else if (data.type == 'message') {
-        //console.log('MESSAGE '+client.data?.client+'@'+client.channel+' '+data.message);
-
         Channels.notifySubscriberMessageRecieved(
             // Channel name
             client.channel,

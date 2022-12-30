@@ -36,6 +36,25 @@ function setSubscriberStatusDisconnected(subscriber) {
 }
 
 /**
+ * Klientam nosūtīts Pong (atbilde uz ping)
+ */
+function setSubscriberStatusPong(subscriber) {
+    if (!subscriber.channelSubscriberStatusId) {
+        return
+    }
+
+    Mysql.update(
+        'channel_subscriber_statuses',
+        {
+            pong_at: Mysql.now()
+        },
+        {
+            id: subscriber.channelSubscriberStatusId
+        }
+    )
+}
+
+/**
  * Izveidojam subscriber status DB ierakstu
  * Tādā veidā vienmēr varēs update tieši ierakstu
  * un nevajadzēs meklēt datubāzē pēc subscriber id
@@ -139,6 +158,7 @@ module.exports = {
     notify: notify,
     notifyBySubscriber: notifyBySubscriber,
     findByClient: findByClient,
+    setSubscriberStatusPong: setSubscriberStatusPong,
     // Intervāls kādā izvākt inactive
     removeInactiveEverySeconds: function(seconds) {
         setInterval(removeInactive, seconds * 1000)
