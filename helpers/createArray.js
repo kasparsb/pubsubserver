@@ -8,7 +8,7 @@ function createArray(value) {
     let r = Array.isArray(value) ? value : [value];
 
     return r
-        .map(value => value.trim())
+        .map(value => value ? value.trim() : null)
         .filter(value => value ? true : false)
 }
 
