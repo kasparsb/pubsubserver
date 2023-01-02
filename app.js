@@ -18,6 +18,9 @@ let routeNotifyChannel = require('./routes/routeNotifyChannel');
 let routeNotifySubscriber = require('./routes/routeNotifySubscriber');
 let routeShowLog = require('./routes/routeShowLog');
 let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
+let routeSubscriberMessage = require('./routes/routeSubscriberMessage');
+let routeSubscriberMessageCustom = require('./routes/routeSubscriberMessageCustom');
+let routePostSubscriberMessageCustom = require('./routes/routePostSubscriberMessageCustom');
 
 // Socket actions
 let socketAcceptRequest = require('./socket/socketAcceptRequest');
@@ -38,7 +41,17 @@ function startServer() {
     Route.default(routeDefault)
     Route.post('/channels/updated', routeChannelsUpdated)
     Route.get('/channel/notify', routeNotifyChannel)
+
+    /**
+     * @todod šito atstājam, tika legacy. Bet vajag nevis notify, bet message vai custom
+     */
     Route.get('/subscriber/notify', routeNotifySubscriber)
+
+    Route.get('/subscriber/message', routeSubscriberMessage);
+    Route.get('/subscriber/send', routeSubscriberMessageCustom);
+    Route.post('/subscriber/send', routePostSubscriberMessageCustom);
+
+
     Route.get('/subscriber/status', routeGetSubscriberStatus)
     Route.get('/log', routeShowLog)
 
