@@ -1,5 +1,22 @@
 let http = require('http');
 let url = require('url');
+let querystring = require('querystring');
+
+function onPostBody(request, cb) {
+
+    /**
+     * @todo jāpieliek content-type pārbaude
+     */
+    // request.headers['content-type'] == 'application/x-www-form-urlencoded'
+
+    let postBody = '';
+    request.on('data', function(data){
+        postBody += data;
+    })
+    request.on('end', function(data){
+        cb(querystring.parse(postBody));
+    })
+}
 
 function handleRequest(request, response, routes) {
 
@@ -13,18 +30,42 @@ function handleRequest(request, response, routes) {
         response.end();
     }, 5000)
 
-    route(
-        requestUrl.query,
-        // Callback for writing to response
-        function(responseData){
-            response.write(responseData)
-        },
-        // When route done its job
-        function(){
-            clearTimeout(requestTimeout);
-            response.end();
-        }
-    )
+    // POST
+    if (request.method == 'POST') {
+        onPostBody(request, postData => {
+
+            route(
+                requestUrl.query,
+                postData,
+                // Callback for writing to response
+                function(responseData){
+                    response.write(responseData)
+                },
+                // When route done its job
+                function(){
+                    clearTimeout(requestTimeout);
+                    response.end();
+                }
+            )
+
+        })
+    }
+    else {
+        route(
+            requestUrl.query,
+            // Callback for writing to response
+            function(responseData){
+                response.write(responseData)
+            },
+            // When route done its job
+            function(){
+                clearTimeout(requestTimeout);
+                response.end();
+            }
+        )
+    }
+
+
 }
 
 function createServer(port, listenIp, routes) {
