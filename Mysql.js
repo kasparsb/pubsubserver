@@ -71,6 +71,26 @@ function insertOrUpdate(tableName, data, where, cb) {
     });
 }
 
+function chunk(perPage, sql, cb, doneCb) {
+    let offset = 0;
+
+    function q() {
+        query(sql+' LIMIT '+perPage+' OFFSET '+offset, [], function(results){
+            cb(results)
+
+            offset += perPage;
+            if (results.length > 0) {
+                q();
+            }
+            else {
+                doneCb()
+            }
+        })
+    }
+
+    q();
+}
+
 function query(sql, values, cb) {
     connection.query(sql, values, function(err, results){
         if (err) {
@@ -127,6 +147,7 @@ module.exports = {
         return formatDate.ymdhis(new Date())
     },
     getRows: getRows,
+    chunk: chunk,
     connect: connect,
     disconnect: disconnect
 }
