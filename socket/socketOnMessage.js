@@ -19,8 +19,8 @@ let messageMessage = require('../message/message');
  *     message: object??,
  * }
  */
-function socketOnMessage(client, message) {
-    client.lastMessageAt = timer();
+function socketOnMessage(subscriber, message) {
+    subscriber.lastMessageAt = timer();
 
     let data = null;
 
@@ -40,8 +40,8 @@ function socketOnMessage(client, message) {
          */
         //if (client.connection.connected) {  Patestējam, kā būs ja sūtīs ping arī tam, kas nav connected
             // Atbildam ar pong
-            client.connection.sendUTF(JSON.stringify(messagePong()));
-            ClientsList.setSubscriberStatusPong(client);
+            subscriber.connection.sendUTF(JSON.stringify(messagePong()));
+            ClientsList.setSubscriberStatusPong(subscriber);
         //}
 
 
