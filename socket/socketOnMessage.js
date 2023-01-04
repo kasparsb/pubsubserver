@@ -1,5 +1,6 @@
 let Channels = require('../Channels');
 let ClientsList = require('../ClientsList');
+let Listeners = require('../Listeners');
 let timer = require('../timer');
 
 let messagePong = require('../message/pong');
@@ -46,6 +47,12 @@ function socketOnMessage(subscriber, message) {
 
 
     }
+    /**
+     * Special case, admin channel users can listen on channel|subscriber changes
+     */
+    else if (data.type == 'listen') {
+        Listeners.add(subscriber, data.eventName, data.subjects);
+    }
     else if (data.type == 'message') {
         Channels.notifySubscriberMessageRecieved(
             // Channel name
@@ -55,27 +62,3 @@ function socketOnMessage(subscriber, message) {
     }
 }
 module.exports = socketOnMessage;
-
-
-
-//request.resourceURL.query.role
-    // if (message.type === 'utf8')
-    // if (message.type === 'binary')
-    // connection.sendUTF(message.utf8Data);
-    // connection.sendBytes(message.binaryData);
-    // connection.remoteAddress
-
-    //console.log('request', request.origin);
-    //console.log(request.resourceURL.query);
-
-
-    /**
-     * @todo Jāpārbauda origin request.origin
-     * ja tas nav mūsu origin tad jātaisa request.reject()
-     */
-
-
-    // setTimeout(() => {
-    //     request.reject();
-    // }, 2000)
-    // return;

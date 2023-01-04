@@ -1,11 +1,11 @@
 let timer = require('./timer');
 let Redis = require('./Redis');
 let StateStore = require('./StateStore');
+let Listeners = require('./Listeners');
 let formatDate = require('./helpers/formatDate');
 
 let subscribers = []
 
-let monitors = [];
 
 /**
  * Pievieno klientu aktīvajā konekcijām
@@ -25,7 +25,13 @@ function connect(channel, connection, data, ip, socketVersion) {
         // Tas ko klients iesūtījis pieslēdzoties
         data: data,
         disconnectAt: null,
-        lastMessageAt: null
+        lastMessageAt: null,
+
+        /**
+         * Admin eventi uz kuriem parakstīts subscriber
+         * Kad subscriber disconnect, tad noņemts no Listeners
+         */
+        listeningOn: []
     }
 
     let newLength = subscribers.push(subscriber);
@@ -38,11 +44,9 @@ function connect(channel, connection, data, ip, socketVersion) {
     /**
      * Trigger listeners
      */
-    if (typeof monitors['channel'+subscriber.channel.name] != 'undefined') {
-        monitors['channel'+subscriber.channel.name].forEach(id => {
-            notifyBySubscriberId(id)
-        })
-    }
+    Listeners.triggerChannelChange(channel, {
+        subscribers_count: channelSubscribersCount(channel)
+    })
 
     return subscriber;
 }
@@ -51,12 +55,13 @@ function disconnect(subscriber) {
     subscriber.disconnectAt = timer();
 
     StateStore.setSubscriberStatusDisconnected(subscriber);
-}
 
-function notifyBySubscriberId(subscriberId) {
-    subscribers
-        .filter(subscriber => subscriber.id == subscriberId)
-        .forEach(subscriber => subscriber.connection.sendUTF(JSON.stringify({'channel_count': 2})))
+    Listeners.remove(subscriber);
+
+    // Channel change
+    Listeners.triggerChannelChange(subscriber.channel, {
+        subscribers_count: channelSubscribersCount(subscriber.channel)
+    })
 }
 
 function notify(channelName, message) {
@@ -103,6 +108,16 @@ function removeInactive() {
     }
 }
 
+function channelSubscribersCount(channel) {
+    let r = 0;
+    for (let i = 0; i < subscribers.length; i++) {
+        if (subscribers[i].channel.id == channel.id) {
+            r++;
+        }
+    }
+    return r;
+}
+
 module.exports = {
     connect: connect,
     disconnect: disconnect,
@@ -115,18 +130,5 @@ module.exports = {
     // Intervāls kādā izvākt inactive
     removeInactiveEverySeconds: function(seconds) {
         setInterval(removeInactive, seconds * 1000)
-    },
-
-    addChannelMonitor(subscriber, channels) {
-        channels.forEach(channelName => {
-
-            if (typeof monitors['channel'+channelName] == 'undefined') {
-                monitors['channel'+channelName] = [];
-            }
-
-            monitors['channel'+channelName].push(subscriber.id)
-        })
-
-        console.log(monitors);
     }
 };
