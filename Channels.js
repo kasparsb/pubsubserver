@@ -49,8 +49,6 @@ function loadFromDb(done) {
 
         channels = data;
 
-        //dumpChannels(channels);
-
         done();
     })
 }
