@@ -4,6 +4,7 @@
 let Mysql = require('./Mysql');
 let Redis = require('./Redis');
 
+let StateStore = require('./StateStore')
 let ClientsList = require('./ClientsList')
 let Channels = require('./Channels');
 let timer = require('./timer');
@@ -32,8 +33,10 @@ let socketOnClose = require('./socket/socketOnClose');
 const port = 70;
 
 Redis.connect(function(){
-    Mysql.connect(function(){
-        Channels.loadFromDb(startServer)
+    StateStore.cleanUp(function(){
+        Mysql.connect(function(){
+            Channels.loadFromDb(startServer)
+        })
     })
 })
 

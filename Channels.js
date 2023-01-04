@@ -47,12 +47,9 @@ function send(url, message, tries) {
 function loadFromDb(done) {
     loadChannelsFromDb(function(data){
 
-        // Clean up clients list before new channels
-        ClientsList.cleanUpClientsInChannels(data);
-
         channels = data;
 
-        dumpChannels(channels);
+        //dumpChannels(channels);
 
         done();
     })

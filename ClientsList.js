@@ -1,64 +1,11 @@
 let timer = require('./timer');
 let Redis = require('./Redis');
+let StateStore = require('./StateStore');
 let formatDate = require('./helpers/formatDate');
 
 let subscribers = []
 
-function cleanUpClientsInChannels(channels) {
-    let transation = Redis.client().multi();
-    channels.forEach(channel => transation.DEL('channel'+channel.id));
-    transation.exec();
-}
-
-function setSubscriberDataInHash(subscriberId, data) {
-    let transaction = Redis.client().multi();
-    for (let field in data) {
-        transaction.HSET('client'+subscriberId, field, data[field]);
-    }
-    transaction.EXPIRE('client'+subscriberId, 60*5);
-    transaction.exec();
-}
-
-function addSubscriberToRedis(subscriber) {
-    // Channel set, te būs visu subscribers id
-    Redis.client().SADD('channel'+subscriber.channel.id, subscriber.id);
-
-    // SET, te glabājam subscriber datus
-    setSubscriberDataInHash(subscriber.id, {
-        channel_id: subscriber.channel.id,
-        subscriber_id: subscriber.data.client,
-        ip: subscriber.ip,
-        created_at: formatDate.ymdhis(new Date()),
-        status: 'connected',
-        connected_at: formatDate.ymdhis(new Date()),
-        disconnected_at: ''
-    })
-}
-function removeSubscriberFromRedis(subscriber) {
-    // Izmetam no channel SET
-    Redis.client().multi()
-        .DEL('client'+subscriber.id)
-        .SREM('channel'+subscriber.channel.id, subscriber.id)
-        .exec();
-}
-function setSubscriberStatusConnected(subscriber) {
-    setSubscriberDataInHash(subscriber.id, {
-        status: 'connected',
-        connected_at: formatDate.ymdhis(new Date()),
-        disconnected_at: ''
-    })
-}
-function setSubscriberStatusDisconnected(subscriber) {
-    setSubscriberDataInHash(subscriber.id, {
-        status: 'disconnected',
-        disconnected_at: formatDate.ymdhis(new Date()),
-    })
-}
-function setSubscriberStatusPong(subscriber) {
-    setSubscriberDataInHash(subscriber.id, {
-        pong_at: formatDate.ymdhis(new Date())
-    })
-}
+let monitors = [];
 
 /**
  * Pievieno klientu aktīvajā konekcijām
@@ -86,18 +33,16 @@ function connect(channel, connection, data, ip, socketVersion) {
     // Create unique ID, milliseconds plus index in array
     subscribers[newLength-1].id = (new Date().getTime())+'-'+(newLength-1)
 
-
-
+    StateStore.addSubscriber(subscribers[newLength-1]);
 
     /**
-     *
-     *
-     * @todo Push only one client to channel List in Redis
-     *
-     *
+     * Trigger listeners
      */
-    addSubscriberToRedis(subscribers[newLength-1]);
-
+    if (typeof monitors['channel'+subscriber.channel.name] != 'undefined') {
+        monitors['channel'+subscriber.channel.name].forEach(id => {
+            notifyBySubscriberId(id)
+        })
+    }
 
     return subscriber;
 }
@@ -105,7 +50,13 @@ function connect(channel, connection, data, ip, socketVersion) {
 function disconnect(subscriber) {
     subscriber.disconnectAt = timer();
 
-    setSubscriberStatusDisconnected(subscriber);
+    StateStore.setSubscriberStatusDisconnected(subscriber);
+}
+
+function notifyBySubscriberId(subscriberId) {
+    subscribers
+        .filter(subscriber => subscriber.id == subscriberId)
+        .forEach(subscriber => subscriber.connection.sendUTF(JSON.stringify({'channel_count': 2})))
 }
 
 function notify(channelName, message) {
@@ -144,7 +95,7 @@ function removeInactive() {
         // 3600
         if (subscribers[i].disconnectAt && subscribers[i].disconnectAt.duration() > 40) {
 
-            removeSubscriberFromRedis(subscribers[i]);
+            StateStore.removeSubscriber(subscribers[i]);
 
             subscribers.splice(i, 1);
             i--;
@@ -158,10 +109,24 @@ module.exports = {
     notify: notify,
     notifyBySubscriber: notifyBySubscriber,
     findByClient: findByClient,
-    setSubscriberStatusPong: setSubscriberStatusPong,
-    cleanUpClientsInChannels: cleanUpClientsInChannels,
+    setSubscriberStatusPong: function(subscriber){
+        StateStore.setSubscriberStatusPong(subscriber)
+    },
     // Intervāls kādā izvākt inactive
     removeInactiveEverySeconds: function(seconds) {
         setInterval(removeInactive, seconds * 1000)
+    },
+
+    addChannelMonitor(subscriber, channels) {
+        channels.forEach(channelName => {
+
+            if (typeof monitors['channel'+channelName] == 'undefined') {
+                monitors['channel'+channelName] = [];
+            }
+
+            monitors['channel'+channelName].push(subscriber.id)
+        })
+
+        console.log(monitors);
     }
 };
