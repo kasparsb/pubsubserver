@@ -48,10 +48,21 @@ function socketOnMessage(subscriber, message) {
 
     }
     /**
-     * Special case, admin channel users can listen on channel|subscriber changes
+     * Special case, admin channel subscribers
+     * they can watch changes in
+     *      channelChange
+     *      subscriberChange
+     * @eventName channelChange|subscriberChange
+     * @subjects channel name or subscriber id
      */
-    else if (data.type == 'listen') {
+    else if (data.type == 'watch') {
         Listeners.add(subscriber, data.eventName, data.subjects);
+    }
+    else if (data.type == 'unwatch') {
+        Listeners.remove(subscriber, data.eventName, data.subjects);
+    }
+    else if (data.type == 'unwatchall') {
+        Listeners.remove(subscriber);
     }
     else if (data.type == 'message') {
         Channels.notifySubscriberMessageRecieved(

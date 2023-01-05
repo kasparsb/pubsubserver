@@ -16,6 +16,7 @@ function cleanUp(doneCb) {
         // Remove up channel SET
         channels.forEach(channelId => {
             transaction.DEL('channel:'+channelId)
+            transaction.DEL('channel:subscribers_count:'+channelId)
         })
         transaction.exec();
 
@@ -47,17 +48,7 @@ function addSubscriber(subscriber) {
     Redis.client().SADD('channel:'+subscriber.channel.id, subscriber.id);
 
     // SET, te glabājam subscriber datus
-    setSubscriberData(subscriber, {
-        channel_id: subscriber.channel.id,
-        subscriber_id: subscriber.data.client,
-        ip: subscriber.ip,
-
-        created_at: formatDate.ymdhis(new Date()),
-        connected_at: formatDate.ymdhis(new Date()),
-        disconnected_at: '',
-
-        status: 'connected'
-    })
+    updateSubscriberData(subscriber)
 }
 
 function removeSubscriber(subscriber) {
@@ -75,7 +66,20 @@ function removeSubscriber(subscriber) {
  *
  * Klienta datiem tiek uzstādīts expire
  */
-function setSubscriberData(subscriber, data) {
+function updateSubscriberData(subscriber) {
+    let data = {
+        id: subscriber.id,
+        channel_id: subscriber.channel.id,
+        subscriber_id: subscriber.data.client,
+        ip: subscriber.ip,
+
+        created_at: subscriber.created_at,
+        connected_at: subscriber.connected_at,
+        disconnected_at: subscriber.disconnected_at,
+        pong_at: subscriber.pong_at,
+
+        status: subscriber.status
+    }
     let transaction = Redis.multi();
     for (let field in data) {
         transaction.HSET('subscriber:'+subscriber.id, field, data[field]);
@@ -84,32 +88,14 @@ function setSubscriberData(subscriber, data) {
     transaction.exec();
 }
 
-function setSubscriberStatusConnected(subscriber) {
-    setSubscriberData(subscriber, {
-        status: 'connected',
-        connected_at: formatDate.ymdhis(new Date()),
-        disconnected_at: ''
-    })
-}
-
-function setSubscriberStatusDisconnected(subscriber) {
-    setSubscriberData(subscriber, {
-        status: 'disconnected',
-        disconnected_at: formatDate.ymdhis(new Date()),
-    })
-}
-function setSubscriberStatusPong(subscriber) {
-    setSubscriberData(subscriber, {
-        pong_at: formatDate.ymdhis(new Date())
-    })
+function setChannelSubscribersCount(channel, subscribersCount) {
+    Redis.client().SET('channel:subscribers_count:'+channel.id, subscribersCount)
 }
 
 module.exports = {
     cleanUp: cleanUp,
-    setSubscriberData: setSubscriberData,
+    updateSubscriberData: updateSubscriberData,
     addSubscriber: addSubscriber,
     removeSubscriber: removeSubscriber,
-    setSubscriberStatusConnected: setSubscriberStatusConnected,
-    setSubscriberStatusDisconnected: setSubscriberStatusDisconnected,
-    setSubscriberStatusPong: setSubscriberStatusPong
+    setChannelSubscribersCount: setChannelSubscribersCount
 }

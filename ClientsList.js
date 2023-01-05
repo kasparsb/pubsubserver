@@ -27,6 +27,13 @@ function connect(channel, connection, data, ip, socketVersion) {
         disconnectAt: null,
         lastMessageAt: null,
 
+        created_at: formatDate.ymdhis(new Date()),
+        connected_at: formatDate.ymdhis(new Date()),
+        disconnected_at: '',
+        pong_at: '',
+
+        status: 'connected',
+
         /**
          * Admin eventi uz kuriem parakstīts subscriber
          * Kad subscriber disconnect, tad noņemts no Listeners
@@ -41,27 +48,32 @@ function connect(channel, connection, data, ip, socketVersion) {
 
     StateStore.addSubscriber(subscribers[newLength-1]);
 
-    /**
-     * Trigger listeners
-     */
+    let sc = channelSubscribersCount(channel);
+    StateStore.setChannelSubscribersCount(channel, sc);
     Listeners.triggerChannelChange(channel, {
-        subscribers_count: channelSubscribersCount(channel)
+        subscribers_count: sc
     })
+    Listeners.triggerSubscriberChange(subscribers[newLength-1])
 
     return subscriber;
 }
 
 function disconnect(subscriber) {
     subscriber.disconnectAt = timer();
+    subscriber.status = 'disconnected';
+    subscriber.disconnected_at = formatDate.ymdhis(new Date());
 
-    StateStore.setSubscriberStatusDisconnected(subscriber);
+    StateStore.updateSubscriberData(subscriber)
 
     Listeners.remove(subscriber);
 
+    let sc = channelSubscribersCount(subscriber.channel);
+    StateStore.setChannelSubscribersCount(subscriber.channel, sc);
     // Channel change
     Listeners.triggerChannelChange(subscriber.channel, {
-        subscribers_count: channelSubscribersCount(subscriber.channel)
+        subscribers_count: sc
     })
+    Listeners.triggerSubscriberChange(subscriber)
 }
 
 function notify(channelName, message) {
@@ -112,7 +124,9 @@ function channelSubscribersCount(channel) {
     let r = 0;
     for (let i = 0; i < subscribers.length; i++) {
         if (subscribers[i].channel.id == channel.id) {
-            r++;
+            if (!subscribers[i].disconnectAt) {
+                r++;
+            }
         }
     }
     return r;
@@ -125,7 +139,11 @@ module.exports = {
     notifyBySubscriber: notifyBySubscriber,
     findByClient: findByClient,
     setSubscriberStatusPong: function(subscriber){
-        StateStore.setSubscriberStatusPong(subscriber)
+
+        subscriber.pong_at = formatDate.ymdhis(new Date());
+
+        StateStore.updateSubscriberData(subscriber)
+        Listeners.triggerSubscriberChange(subscriber)
     },
     // Intervāls kādā izvākt inactive
     removeInactiveEverySeconds: function(seconds) {
