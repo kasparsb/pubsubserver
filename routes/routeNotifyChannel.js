@@ -5,7 +5,7 @@ function routeNotifyChannel(query, writeResponse, routeCompleted) {
     ClientsList.notify(
         // Channel name
         query.channel,
-        messageMessage(query.message)
+        messageMessage(query.message, query.payload)
     );
 
     routeCompleted();
