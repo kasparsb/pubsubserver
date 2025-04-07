@@ -1,7 +1,8 @@
 let redis = require('redis');
 
 let client = redis.createClient({
-    url: 'redis://192.168.2.1:6367/3'
+    //url: 'redis://192.168.2.1:6367/3'
+    url: 'redis://127.0.0.1'
 });
 
 client.on('error', (err) => console.log('Redis Client Error', err));

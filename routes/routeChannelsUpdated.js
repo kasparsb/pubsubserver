@@ -1,6 +1,6 @@
 let Channels = require('../Channels');
 
-function routeChannelsUpdated(query, writeResponse, routeCompleted) {
+function routeChannelsUpdated(query, postData, writeResponse, routeCompleted) {
 
     Channels.loadFromDb(function(){
         writeResponse('done');

@@ -19,10 +19,12 @@ let routeGetSubscriberStatus = require('./routes/routeGetSubscriberStatus');
 let routeNotifyChannel = require('./routes/routeNotifyChannel');
 let routeNotifySubscriber = require('./routes/routeNotifySubscriber');
 let routeShowLog = require('./routes/routeShowLog');
+let routeHealth = require('./routes/routeHealth');
 let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
 let routeSubscriberMessage = require('./routes/routeSubscriberMessage');
 let routeSubscriberMessageCustom = require('./routes/routeSubscriberMessageCustom');
 let routePostSubscriberMessageCustom = require('./routes/routePostSubscriberMessageCustom');
+let routePostChannelMessageCustom = require('./routes/routePostChannelMessageCustom');
 
 // Socket actions
 let socketAcceptRequest = require('./socket/socketAcceptRequest');
@@ -30,7 +32,7 @@ let socketGetClient = require('./socket/socketGetClient');
 let socketOnMessage = require('./socket/socketOnMessage');
 let socketOnClose = require('./socket/socketOnClose');
 
-const port = 70;
+const port = 80;
 
 Redis.connect(function(){
     StateStore.cleanUp(function(){
@@ -46,12 +48,15 @@ function startServer() {
 
     Route.default(routeDefault)
     Route.post('/channels/updated', routeChannelsUpdated)
-    Route.get('/channel/notify', routeNotifyChannel)
+
 
     /**
      * @todod šito atstājam, tika legacy. Bet vajag nevis notify, bet message vai custom
      */
+    Route.get('/channel/notify', routeNotifyChannel)
     Route.get('/subscriber/notify', routeNotifySubscriber)
+
+    Route.post('/channel/send', routePostChannelMessageCustom)
 
     Route.get('/subscriber/message', routeSubscriberMessage);
     Route.get('/subscriber/send', routeSubscriberMessageCustom);
@@ -60,6 +65,8 @@ function startServer() {
 
     Route.get('/subscriber/status', routeGetSubscriberStatus)
     Route.get('/log', routeShowLog)
+
+    Route.get('/health', routeHealth)
 
     let server = createServer(port, '0.0.0.0', Route.all())
 

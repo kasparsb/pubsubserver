@@ -1,5 +1,4 @@
 let timer = require('./timer');
-let Redis = require('./Redis');
 let StateStore = require('./StateStore');
 let Listeners = require('./Listeners');
 let formatDate = require('./helpers/formatDate');
@@ -76,9 +75,9 @@ function disconnect(subscriber) {
     Listeners.triggerSubscriberChange(subscriber)
 }
 
-function notify(channelName, message) {
+function notifyChannel(channelName, message) {
     subscribers
-        .filter(subscriber => subscriber.channel == channelName)
+        .filter(subscriber => subscriber.channel.name == channelName)
         .filter(subscriber => subscriber.connection.connected)
         .forEach(subscriber => {
             subscriber.connection.sendUTF(JSON.stringify(message));
@@ -135,7 +134,7 @@ function channelSubscribersCount(channel) {
 module.exports = {
     connect: connect,
     disconnect: disconnect,
-    notify: notify,
+    notifyChannel: notifyChannel,
     notifyBySubscriber: notifyBySubscriber,
     findByClient: findByClient,
     setSubscriberStatusPong: function(subscriber){
