@@ -3,7 +3,7 @@ let Channels = require('../Channels')
 
 let messageStatus = require('../message/status');
 
-function socketGetClient(request, connection) {
+function socketCreateClient(request, connection) {
     let channel = Channels.get(request.resourceURL.query.channel);
 
     if (!channel) {
@@ -29,4 +29,4 @@ function socketGetClient(request, connection) {
 
     return subscriber;
 }
-module.exports = socketGetClient;
+module.exports = socketCreateClient;
