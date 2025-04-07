@@ -27,7 +27,7 @@ let routePostSubscriberMessageCustom = require('./routes/routePostSubscriberMess
 let routePostChannelMessageCustom = require('./routes/routePostChannelMessageCustom');
 
 // Socket actions
-let socketAcceptRequest = require('./socket/socketAcceptRequest');
+let socketCanAcceptRequest = require('./socket/socketCanAcceptRequest');
 let socketCreateClient = require('./socket/socketCreateClient');
 let socketOnMessage = require('./socket/socketOnMessage');
 let socketOnClose = require('./socket/socketOnClose');
@@ -73,7 +73,7 @@ function startServer() {
 
 
     let socketServer = createSocketServer(server)
-    socketServer.setCanAcceptRequestFunction(socketAcceptRequest)
+    socketServer.setCanAcceptRequestFunction(socketCanAcceptRequest)
     socketServer.setCreateClientFunction(socketCreateClient)
     socketServer.onMessage(socketOnMessage)
     socketServer.onClose(socketOnClose)
