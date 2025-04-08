@@ -20,8 +20,8 @@ let messageMessage = require('../message/message');
  *     message: object??,
  * }
  */
-function socketOnMessage(subscriber, message) {
-    subscriber.lastMessageAt = timer();
+function socketOnMessage(client, message) {
+    client.lastMessageAt = timer();
 
     let data = null;
 
@@ -41,8 +41,10 @@ function socketOnMessage(subscriber, message) {
          */
         //if (client.connection.connected) {  Patestējam, kā būs ja sūtīs ping arī tam, kas nav connected
             // Atbildam ar pong
-            subscriber.connection.sendUTF(JSON.stringify(messagePong()));
-            ClientsList.setSubscriberStatusPong(subscriber);
+            client.sendMessage(messagePong());
+            client.touchPongAt();
+            console.log('PING/PONG', client.connectionName);
+            //ClientsList.setSubscriberStatusPong(subscriber);
         //}
 
 

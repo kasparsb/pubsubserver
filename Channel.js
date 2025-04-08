@@ -14,8 +14,10 @@ Channel.prototype = {
     connectClient(connection, data, deviceInfo) {
 
         let newClient = new Client(connection, data, deviceInfo);
+        newClient.connect();
 
         this.clients.set(newClient.id, newClient);
+
 
         return newClient;
     }

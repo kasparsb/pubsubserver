@@ -142,6 +142,10 @@ module.exports = {
         subscriber.pong_at = formatDate.ymdhis(new Date());
 
         StateStore.updateSubscriberData(subscriber)
+
+        /**
+         * TODO šeit tiešām uz katru pingo/pong vajag notify
+         */
         Listeners.triggerSubscriberChange(subscriber)
     },
     // Intervāls kādā izvākt inactive

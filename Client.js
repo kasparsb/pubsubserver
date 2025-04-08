@@ -5,8 +5,6 @@ function Client(connection, data, deviceInfo) {
 
     this.connection = connection;
 
-    this.id = undefined;
-
     /**
      * Tas ko klients iesūtījis pieslēdzoties
      */
@@ -17,6 +15,18 @@ function Client(connection, data, deviceInfo) {
      */
     this.deviceInfo = deviceInfo;
 
+
+    /**
+     * Id ņemam no data.client
+     * applikācija, kura izmanto pubsub nodrošinās, ka
+     * katram klientam ir savs unikāls id
+     */
+    this.id = this.data.client;
+
+    /**
+     * Klienta id un channel name
+     */
+    this.connectionName = this.id+'@'+this.data.channel;
 
     this.createdAt = formatDate.ymdhis(new Date());
 
@@ -42,9 +52,21 @@ Client.prototype = {
         this.status = 'disconnected';
         this.disconnectedAt = formatDate.ymdhis(new Date());
     },
+    /**
+     * Send message to client connection
+     * @param message Object
+     *
+     * message tiks konvertēts uz json string
+     */
+    sendMessage(message) {
+        this.connection.sendUTF(JSON.stringify(message));
+    },
+    touchPongAt() {
+        this.pongAt = formatDate.ymdhis(new Date());
+    },
     dump() {
         return {
-            data: this.data,
+            connectionName: this.connectionName,
             createdAt: this.createdAt,
             connectedAt: this.connectedAt,
             pongAt: this.pongAt
