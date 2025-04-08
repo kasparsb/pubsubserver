@@ -5,6 +5,8 @@ function Client(connection, data, deviceInfo) {
 
     this.connection = connection;
 
+    this.topics = [];
+
     /**
      * Tas ko klients iesūtījis pieslēdzoties
      */
@@ -23,10 +25,12 @@ function Client(connection, data, deviceInfo) {
      */
     this.id = this.data.client;
 
+    this.channel = this.data.channel;
+
     /**
      * Klienta id un channel name
      */
-    this.connectionName = this.id+'@'+this.data.channel;
+    this.connectionName = this.id+'@'+this.channel;
 
     this.createdAt = formatDate.ymdhis(new Date());
 
@@ -53,13 +57,27 @@ Client.prototype = {
         this.disconnectedAt = formatDate.ymdhis(new Date());
     },
     /**
+     * Pieraksta klientu uz topics channel ietvaros
+     * Pierakstot tiek pilnībā nodzēsti iepriekšējie topics
+     *
+     * Tas ir domāts, kā vienas lapas ietvaros pierakstīties
+     * uz dažādām lapā redzamām datu vienībām
+     * Tāpēc vienmēr pārrakstām esošos topics, lai nav
+     * uz katru atsevišķi jāatrasktās
+     */
+    subscribeToTopics(topics) {
+        this.topics = topics;
+    },
+    /**
      * Send message to client connection
      * @param message Object
      *
      * message tiks konvertēts uz json string
      */
     sendMessage(message) {
-        console.log('Send message to client: '+this.id, message);
+        if (message.type != 'pong') {
+            console.log('Send message to client: '+this.id, message);
+        }
         this.connection.sendUTF(JSON.stringify(message));
     },
     touchPongAt() {
@@ -70,7 +88,8 @@ Client.prototype = {
             connectionName: this.connectionName,
             createdAt: this.createdAt,
             connectedAt: this.connectedAt,
-            pongAt: this.pongAt
+            pongAt: this.pongAt,
+            topics: this.topics
         }
     }
 }

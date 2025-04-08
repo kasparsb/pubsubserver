@@ -48,6 +48,10 @@ function socketOnMessage(client, message) {
 
 
     }
+    // Pierakstās uz topic
+    else if (data.type == 'subscribe-topics') {
+        Channels.subscribeClientToTopics(client, data.topics);
+    }
     /**
      * Special case, admin channel subscribers
      * they can watch changes in

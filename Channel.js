@@ -8,6 +8,7 @@ function Channel(dbRow) {
     this.data = dbRow;
 
     this.clients = new Map();
+    this.topics = new Map();
 }
 
 Channel.prototype = {
@@ -34,6 +35,37 @@ Channel.prototype = {
         if (client) {
             client.sendMessage(message)
         }
+    },
+    subscribeClientToTopics(client, topics) {
+        // Izvācam client no visiem topics, kuros tas ir tagad pierakstīts
+        client.topics.forEach(topic => this.removeClientFromTopic(topic, client))
+
+        // Pierakstām topickos
+        topics.forEach(topic => this.addClientToTopic(topic, client))
+        // Uzliekam client topics referenci
+        client.subscribeToTopics(topics);
+
+        // Notīrām tukšos topics
+        this.topics.forEach((clients, topic) => {
+            if (!clients.size) {
+
+                this.topics.delete(topic);
+            }
+        })
+    },
+    addClientToTopic(topic, client) {
+        let topicClients = this.topics.has(topic) ? this.topics.get(topic) : new Set();
+        topicClients.add(client.id);
+        this.topics.set(topic, topicClients)
+    },
+    removeClientFromTopic(topic, client) {
+        if (!this.topics.has(topic)) {
+            return;
+        }
+
+        let topicClients = this.topics.get(topic);
+        topicClients.delete(client.id);
+        this.topics.set(topic, topicClients);
     }
 }
 

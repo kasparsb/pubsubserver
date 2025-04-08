@@ -72,7 +72,12 @@ function getClient(channelName, clientId) {
     return channel.getClient(clientId);
 }
 
-
+function subscribeClientToTopics(client, topics) {
+    let channel = findByName(client.channel);
+    if (channel) {
+        channel.subscribeClientToTopics(client, topics)
+    }
+}
 
 
 
@@ -110,6 +115,7 @@ module.exports = {
     getClient: getClient,
     sendMessage: sendMessage,
     sendMessageToClient: sendMessageToClient,
+    subscribeClientToTopics: subscribeClientToTopics,
 
 
 
