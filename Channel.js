@@ -20,6 +20,9 @@ Channel.prototype = {
 
         return newClient;
     },
+    getClient(clientId) {
+        return this.clients.get(clientId);
+    },
     /**
      * Sūta message visiem kanāla clients
      */

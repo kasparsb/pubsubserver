@@ -58,14 +58,20 @@ function sendMessage(channelName, message) {
 function sendMessageToClient(channelName, clientId, message) {
     let channel = findByName(channelName);
 
-    console.log(channelName);
-
     if (channel) {
         channel.sendMessageToClient(clientId, message)
     }
 }
 
+function getClient(channelName, clientId) {
+    let channel = findByName(channelName);
+    console.log(channelName);
+    if (!channel) {
+        return null;
+    }
 
+    return channel.getClient(clientId);
+}
 
 
 
@@ -102,6 +108,7 @@ module.exports = {
     loadFromDb: loadFromDb,
 
     connectClient: connectClient,
+    getClient: getClient,
     sendMessage: sendMessage,
     sendMessageToClient: sendMessageToClient,
 

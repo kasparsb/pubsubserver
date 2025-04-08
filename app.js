@@ -15,7 +15,7 @@ let createSocketServer = require('./createSocketServer');
 
 // Routes
 let routeDefault = require('./routes/routeDefault');
-let routeGetSubscriberStatus = require('./routes/routeGetSubscriberStatus');
+
 let routeNotifyChannel = require('./routes/routeNotifyChannel');
 let routeNotifySubscriber = require('./routes/routeNotifySubscriber');
 let routeShowLog = require('./routes/routeShowLog');
@@ -23,6 +23,8 @@ let routeHealth = require('./routes/routeHealth');
 let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
 let routeSubscriberMessage = require('./routes/routeSubscriberMessage');
 
+
+let routeGetClientStatus = require('./routes/routeGetClientStatus');
 let routePostClientMessage = require('./routes/routePostClientMessage');
 let routePostChannelMessage = require('./routes/routePostChannelMessage');
 
@@ -52,6 +54,10 @@ function startServer() {
     Route.post('/topic/message', routePostChannelMessage);
     Route.post('/client/message', routePostClientMessage);
 
+    Route.get('/client/status', routeGetClientStatus)
+    Route.get('/log', routeShowLog)
+    Route.get('/health', routeHealth)
+
 
     /**
      * TODO šo jāvāc ārā, jo kanāli tiks iesūtīti pa rest api
@@ -78,10 +84,7 @@ function startServer() {
     // Route.post('/subscriber/send', routePostSubscriberMessageCustom);
 
 
-    Route.get('/subscriber/status', routeGetSubscriberStatus)
-    Route.get('/log', routeShowLog)
 
-    Route.get('/health', routeHealth)
 
     let server = createServer(port, '0.0.0.0', Route.all())
 
