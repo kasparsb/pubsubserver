@@ -14,16 +14,9 @@ let createServer = require('./createServer');
 let createSocketServer = require('./createSocketServer');
 
 // Routes
+//let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
 let routeDefault = require('./routes/routeDefault');
-
-let routeNotifyChannel = require('./routes/routeNotifyChannel');
-let routeNotifySubscriber = require('./routes/routeNotifySubscriber');
-let routeShowLog = require('./routes/routeShowLog');
 let routeHealth = require('./routes/routeHealth');
-let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
-let routeSubscriberMessage = require('./routes/routeSubscriberMessage');
-
-
 let routeGetClientStatus = require('./routes/routeGetClientStatus');
 let routePostClientMessage = require('./routes/routePostClientMessage');
 let routePostChannelMessage = require('./routes/routePostChannelMessage');
@@ -55,7 +48,6 @@ function startServer() {
     Route.post('/client/message', routePostClientMessage);
 
     Route.get('/client/status', routeGetClientStatus)
-    Route.get('/log', routeShowLog)
     Route.get('/health', routeHealth)
 
 
@@ -64,7 +56,7 @@ function startServer() {
      * nevis kā līdz šim updated datubāzē un tad šeit padod
      * ziņu, ka jauni kanāli ienākuši
      */
-    Route.post('/channels/updated', routeChannelsUpdated);
+    //Route.post('/channels/updated', routeChannelsUpdated);
 
 
 

@@ -65,7 +65,6 @@ function sendMessageToClient(channelName, clientId, message) {
 
 function getClient(channelName, clientId) {
     let channel = findByName(channelName);
-    console.log(channelName);
     if (!channel) {
         return null;
     }
