@@ -50,7 +50,9 @@ function socketOnMessage(client, message) {
     }
     // Pierakstās uz topic
     else if (data.type == 'subscribe-topics') {
-        Channels.subscribeClientToTopics(client, data.topics);
+        if (typeof data.topics != 'undefined') {
+            Channels.subscribeClientToTopics(client, data.topics);
+        }
     }
     /**
      * Special case, admin channel subscribers

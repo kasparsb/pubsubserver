@@ -63,6 +63,14 @@ function sendMessageToClient(channelName, clientId, message) {
     }
 }
 
+function sendMessageToTopic(channelName, clientId, message) {
+    let channel = findByName(channelName);
+
+    if (channel) {
+        channel.sendMessageToTopic(clientId, message)
+    }
+}
+
 function getClient(channelName, clientId) {
     let channel = findByName(channelName);
     if (!channel) {
@@ -115,6 +123,7 @@ module.exports = {
     getClient: getClient,
     sendMessage: sendMessage,
     sendMessageToClient: sendMessageToClient,
+    sendMessageToTopic: sendMessageToTopic,
     subscribeClientToTopics: subscribeClientToTopics,
 
 

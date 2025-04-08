@@ -5,6 +5,15 @@ function Client(connection, data, deviceInfo) {
 
     this.connection = connection;
 
+    /**
+     * Pieraksta klientu uz topics channel ietvaros
+     * Pierakstot tiek pilnībā nodzēsti iepriekšējie topics
+     *
+     * Tas ir domāts, kā vienas lapas ietvaros pierakstīties
+     * uz dažādām lapā redzamām datu vienībām
+     * Tāpēc vienmēr pārrakstām esošos topics, lai nav
+     * uz katru atsevišķi jāatrasktās
+     */
     this.topics = [];
 
     /**
@@ -55,18 +64,6 @@ Client.prototype = {
         this.disconnectAt = timer();
         this.status = 'disconnected';
         this.disconnectedAt = formatDate.ymdhis(new Date());
-    },
-    /**
-     * Pieraksta klientu uz topics channel ietvaros
-     * Pierakstot tiek pilnībā nodzēsti iepriekšējie topics
-     *
-     * Tas ir domāts, kā vienas lapas ietvaros pierakstīties
-     * uz dažādām lapā redzamām datu vienībām
-     * Tāpēc vienmēr pārrakstām esošos topics, lai nav
-     * uz katru atsevišķi jāatrasktās
-     */
-    subscribeToTopics(topics) {
-        this.topics = topics;
     },
     /**
      * Send message to client connection

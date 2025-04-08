@@ -20,6 +20,7 @@ let routeHealth = require('./routes/routeHealth');
 let routeGetClientStatus = require('./routes/routeGetClientStatus');
 let routePostClientMessage = require('./routes/routePostClientMessage');
 let routePostChannelMessage = require('./routes/routePostChannelMessage');
+let routePostTopicMessage = require('./routes/routePostTopicMessage');
 
 // Socket actions
 let socketCanAcceptRequest = require('./socket/socketCanAcceptRequest');
@@ -44,7 +45,7 @@ function startServer() {
     Route.default(routeDefault)
 
     Route.post('/channel/message', routePostChannelMessage);
-    Route.post('/topic/message', routePostChannelMessage);
+    Route.post('/topic/message', routePostTopicMessage);
     Route.post('/client/message', routePostClientMessage);
 
     Route.get('/client/status', routeGetClientStatus)

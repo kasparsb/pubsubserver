@@ -8,6 +8,7 @@ function Channel(dbRow) {
     this.data = dbRow;
 
     this.clients = new Map();
+    // Katrs topic ir set of client ids
     this.topics = new Map();
 }
 
@@ -30,6 +31,15 @@ Channel.prototype = {
     sendMessage(message) {
         this.clients.forEach(client => client.sendMessage(message));
     },
+    sendMessageToTopic(topic, message) {
+        if (!this.topics.has(topic)) {
+            return;
+        }
+
+        // Visiem topic klientiem nosūtām message
+        this.topics.get(topic)
+            .forEach(clientId => this.sendMessageToClient(clientId, message))
+    },
     sendMessageToClient(clientId, message) {
         let client = this.clients.get(clientId);
         if (client) {
@@ -40,10 +50,11 @@ Channel.prototype = {
         // Izvācam client no visiem topics, kuros tas ir tagad pierakstīts
         client.topics.forEach(topic => this.removeClientFromTopic(topic, client))
 
-        // Pierakstām topickos
-        topics.forEach(topic => this.addClientToTopic(topic, client))
         // Uzliekam client topics referenci
-        client.subscribeToTopics(topics);
+        client.topics = topics;
+
+        // Pierakstām topicos
+        topics.forEach(topic => this.addClientToTopic(topic, client))
 
         // Notīrām tukšos topics
         this.topics.forEach((clients, topic) => {
