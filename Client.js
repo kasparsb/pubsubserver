@@ -59,6 +59,7 @@ Client.prototype = {
      * message tiks konvertēts uz json string
      */
     sendMessage(message) {
+        console.log('Send message to client: '+this.id, message);
         this.connection.sendUTF(JSON.stringify(message));
     },
     touchPongAt() {

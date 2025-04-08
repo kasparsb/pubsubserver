@@ -42,14 +42,28 @@ function findByName(channelName) {
 function connectClient(channelName, connection, data, deviceInfo) {
     let channel = findByName(channelName);
 
-    if (!channel) {
-        console.log('Channel not found '+request.resourceURL.query.channel);
-        return null;
+    if (channel) {
+        return channel.connectClient(connection, data, deviceInfo );
     }
-
-    return channel.connectClient(connection, data, deviceInfo );
 }
 
+function sendMessage(channelName, message) {
+    let channel = findByName(channelName);
+
+    if (channel) {
+        channel.sendMessage(message)
+    }
+}
+
+function sendMessageToClient(channelName, clientId, message) {
+    let channel = findByName(channelName);
+
+    console.log(channelName);
+
+    if (channel) {
+        channel.sendMessageToClient(clientId, message)
+    }
+}
 
 
 
@@ -88,6 +102,8 @@ module.exports = {
     loadFromDb: loadFromDb,
 
     connectClient: connectClient,
+    sendMessage: sendMessage,
+    sendMessageToClient: sendMessageToClient,
 
 
 

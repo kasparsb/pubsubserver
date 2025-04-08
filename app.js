@@ -22,9 +22,9 @@ let routeShowLog = require('./routes/routeShowLog');
 let routeHealth = require('./routes/routeHealth');
 let routeChannelsUpdated = require('./routes/routeChannelsUpdated');
 let routeSubscriberMessage = require('./routes/routeSubscriberMessage');
-let routeSubscriberMessageCustom = require('./routes/routeSubscriberMessageCustom');
-let routePostSubscriberMessageCustom = require('./routes/routePostSubscriberMessageCustom');
-let routePostChannelMessageCustom = require('./routes/routePostChannelMessageCustom');
+
+let routePostClientMessage = require('./routes/routePostClientMessage');
+let routePostChannelMessage = require('./routes/routePostChannelMessage');
 
 // Socket actions
 let socketCanAcceptRequest = require('./socket/socketCanAcceptRequest');
@@ -47,20 +47,35 @@ function startServer() {
     ClientsList.removeInactiveEverySeconds(10);
 
     Route.default(routeDefault)
-    Route.post('/channels/updated', routeChannelsUpdated)
+
+    Route.post('/channel/message', routePostChannelMessage);
+    Route.post('/topic/message', routePostChannelMessage);
+    Route.post('/client/message', routePostClientMessage);
+
+
+    /**
+     * TODO šo jāvāc ārā, jo kanāli tiks iesūtīti pa rest api
+     * nevis kā līdz šim updated datubāzē un tad šeit padod
+     * ziņu, ka jauni kanāli ienākuši
+     */
+    Route.post('/channels/updated', routeChannelsUpdated);
+
+
+
+
 
 
     /**
      * @todod šito atstājam, tika legacy. Bet vajag nevis notify, bet message vai custom
      */
-    Route.get('/channel/notify', routeNotifyChannel)
-    Route.get('/subscriber/notify', routeNotifySubscriber)
+    // Route.get('/channel/notify', routeNotifyChannel)
+    // Route.get('/subscriber/notify', routeNotifySubscriber)
 
-    Route.post('/channel/send', routePostChannelMessageCustom)
+    // Route.post('/channel/send', routePostChannelMessageCustom)
 
-    Route.get('/subscriber/message', routeSubscriberMessage);
-    Route.get('/subscriber/send', routeSubscriberMessageCustom);
-    Route.post('/subscriber/send', routePostSubscriberMessageCustom);
+    // Route.get('/subscriber/message', routeSubscriberMessage);
+    // Route.get('/subscriber/send', routeSubscriberMessageCustom);
+    // Route.post('/subscriber/send', routePostSubscriberMessageCustom);
 
 
     Route.get('/subscriber/status', routeGetSubscriberStatus)

@@ -1,17 +1,30 @@
-/**
- * Message, ko sūta uz subscriber vai notify endpoint
- * vajag zināt, kas ir sūtītājs
- * Ja sūta App, tad sūtītāja nebūs
- * Ja sūta subscriber, tad būs sūtītājs
- */
-function message(message, payload, senderSubscriber) {
+function message(messagType, message, payload, payloadType, senderSubscriber) {
+
+    if (!messagType) {
+        messagType = 'message';
+    }
+
+    if (!payloadType) {
+        payloadType = 'json';
+    }
+
     let r = {
-        type: 'message',
+        type: messagType,
         message: message,
     }
 
-    if (typeof payload != 'undefined') {
+    if (payload) {
         r.payload = payload;
+        r.payload_type = payloadType;
+
+        if (payloadType == 'json') {
+            try {
+                r.payload = JSON.parse(r.payload);
+            }
+            catch(e) {
+
+            }
+        }
     }
 
     if (typeof senderSubscriber != 'undefined') {

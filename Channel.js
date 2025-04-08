@@ -18,8 +18,19 @@ Channel.prototype = {
 
         this.clients.set(newClient.id, newClient);
 
-
         return newClient;
+    },
+    /**
+     * Sūta message visiem kanāla clients
+     */
+    sendMessage(message) {
+        this.clients.forEach(client => client.sendMessage(message));
+    },
+    sendMessageToClient(clientId, message) {
+        let client = this.clients.get(clientId);
+        if (client) {
+            client.sendMessage(message)
+        }
     }
 }
 

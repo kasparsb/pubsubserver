@@ -43,7 +43,6 @@ function socketOnMessage(client, message) {
             // Atbildam ar pong
             client.sendMessage(messagePong());
             client.touchPongAt();
-            console.log('PING/PONG', client.connectionName);
             //ClientsList.setSubscriberStatusPong(subscriber);
         //}
 
