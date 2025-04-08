@@ -1,26 +1,7 @@
 let axios = require('axios');
+let Mysql = require('./Mysql');
+let Channel = require('./Channel');
 let ClientsList = require('./ClientsList')
-
-let loadChannelsFromDb = require('./helpers/loadChannelsFromDb');
-let dumpChannels = require('./helpers/dumpChannels');
-
-let channelStructure = {
-    name: '',
-
-    // Ping external url on these events
-    listenerNotifyEndpoints: {
-        subscriberStatusChange: [],
-        subscriberMessageRecieved: []
-    },
-
-    subscriberNotify: {
-        // If true, then send message to all subscribers about other subscriber Status Change
-        subscriberStatusChange: false,
-        // Notify all subscribers when message recieved from subscriber
-        subscriberMessageRecieved: false
-    }
-}
-
 
 let channels = [];
 
@@ -45,17 +26,37 @@ function send(url, message, tries) {
 }
 
 function loadFromDb(done) {
-    loadChannelsFromDb(function(data){
 
-        channels = data;
+    Mysql.getRows('select * from channels', [], function(rows){
+
+        channels = rows.map(row => new Channel(row))
 
         done();
-    })
+    });
 }
 
-function findChannel(channelName) {
+function findByName(channelName) {
     return channels.find(channel => channel.name == channelName);
 }
+
+function connectClient(channelName, connection, data, deviceInfo) {
+    let channel = findByName(channelName);
+
+    if (!channel) {
+        console.log('Channel not found '+request.resourceURL.query.channel);
+        return null;
+    }
+
+    return channel.connectClient(connection, data, deviceInfo );
+}
+
+
+
+
+
+
+
+
 
 /**
  * Send message to channel listener
@@ -83,8 +84,16 @@ function notifyListeners(channelName, eventName, message) {
 }
 
 module.exports = {
-    get: findChannel,
+    findByName: findByName,
     loadFromDb: loadFromDb,
+
+    connectClient: connectClient,
+
+
+
+
+
+
     /**
      * Notify channel listener about message from subscriber
      */

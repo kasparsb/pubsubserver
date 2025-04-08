@@ -4,29 +4,30 @@ let Channels = require('../Channels')
 let messageStatus = require('../message/status');
 
 function socketCreateClient(request, connection) {
-    let channel = Channels.get(request.resourceURL.query.channel);
-
-    if (!channel) {
-        console.log('Channel not found '+request.resourceURL.query.channel);
-    }
-
-    let subscriber = ClientsList.connect(
-        channel,
+    let client = Channels.connectClient(
+        request.resourceURL.query.channel,
         connection,
         {
             ...request.resourceURL.query
         },
-        connection.remoteAddress,
-        connection.webSocketVersion
-    );
+        {
+            ip: connection.remoteAddress,
+            socketVersion: connection.webSocketVersion
+        }
+    )
 
-    console.log('CONNECTED '+subscriber.data.client+'@'+subscriber.channel.name);
+    if (client) {
+        console.log('CONNECTED, channel: '+request.resourceURL.query.channel, client.dump());
+    }
+    else {
+        console.log('CANT CONNECT, channel: '+request.resourceURL.query.channel);
+    }
 
-    Channels.notifySubscriberStatusChange(
-        subscriber.channel,
-        messageStatus('connect', subscriber)
-    );
+    // Channels.notifySubscriberStatusChange(
+    //     subscriber.channel,
+    //     messageStatus('connect', subscriber)
+    // );
 
-    return subscriber;
+    return client;
 }
 module.exports = socketCreateClient;
