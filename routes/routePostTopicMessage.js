@@ -9,16 +9,16 @@ let message = require('../message/message');
  *     message - pats message string, piemēram, invoice_updated
  *     payload - papildus dati json formātā
  */
-function routePostTopicMessage(query, postData, writeResponse, routeCompleted) {
+function routePostTopicMessage(routeData, writeResponse, routeCompleted) {
 
     Channels.sendMessageToTopic(
-        postData.channel,
-        postData.topic,
+        routeData.postData.channel,
+        routeData.postData.topic,
         message(
-            postData.message_type,
-            postData.message,
-            postData.payload,
-            postData.payload_type
+            routeData.postData.message_type,
+            routeData.postData.message,
+            routeData.postData.payload,
+            routeData.postData.payload_type
         )
     );
 

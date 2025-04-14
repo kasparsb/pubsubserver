@@ -1,8 +1,8 @@
 let Channels = require('../Channels')
 
-function routeGetClientStatus(query, writeResponse, routeCompleted) {
+function routeGetClientStatus(routeData, writeResponse, routeCompleted) {
 
-    let client = Channels.getClient(query.channel, query.client)
+    let client = Channels.getClient(routeData.query.channel, routeData.query.client)
 
     writeResponse(JSON.stringify({
         status: client && client.connection.connected ? 'connect' : 'disconnect'

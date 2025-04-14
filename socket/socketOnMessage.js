@@ -52,6 +52,8 @@ function socketOnMessage(client, message) {
                 Channels.subscribeClientToTopics(client, data.topics);
             }
 
+            console.log('subscribe to topics', data.topics);
+
             break;
     }
 

@@ -25,13 +25,33 @@ function send(url, message, tries) {
         })
 }
 
+function createOrUpdate(data, cb) {
+    if (data.id) {
+        Mysql.update(
+            'channels',
+            data,
+            {
+                id: data.id
+            },
+            cb
+        )
+    }
+    else {
+        Mysql.insert(
+            'channels',
+            data,
+            cb
+        )
+    }
+}
+
 function loadFromDb(done) {
 
     Mysql.getRows('select * from channels', [], function(rows){
 
         channels = rows.map(row => new Channel(row))
 
-        done();
+        done(rows);
     });
 }
 
@@ -118,6 +138,7 @@ function notifyListeners(channelName, eventName, message) {
 module.exports = {
     findByName: findByName,
     loadFromDb: loadFromDb,
+    createOrUpdate: createOrUpdate,
 
     connectClient: connectClient,
     getClient: getClient,

@@ -2,6 +2,37 @@ let http = require('http');
 let url = require('url');
 let querystring = require('querystring');
 
+/**
+ * šī metode atšķirībā no querystring.parse(postBody)
+ * pārveidos masīva laukus par masīvu
+ */
+function parsePostBody(body) {
+    let r = {};
+
+    let params = new URLSearchParams(body);
+
+    for (let [key, value] of params) {
+        // Check if the key contains array notation (e.g., field[0], field[1])
+        let arrayMatch = key.match(/^(.+)\[(\d+)\]$/);
+
+        if (arrayMatch) {
+            let fieldName = arrayMatch[1];
+            let index = parseInt(arrayMatch[2]);
+
+            if (!Array.isArray(r[fieldName])) {
+                r[fieldName] = [];
+            }
+
+            r[fieldName][index] = value;
+        }
+        else {
+            r[key] = value;
+        }
+    }
+
+    return r;
+}
+
 function onPostBody(request, cb) {
 
     /**
@@ -14,7 +45,8 @@ function onPostBody(request, cb) {
         postBody += data;
     })
     request.on('end', function(data){
-        cb(querystring.parse(postBody));
+        cb(parsePostBody(postBody));
+        //cb(querystring.parse(postBody));
     })
 }
 
@@ -34,9 +66,13 @@ function handleRequest(request, response, routes) {
     if (request.method == 'POST') {
         onPostBody(request, postData => {
 
-            route(
-                requestUrl.query,
-                postData,
+            route.handler(
+                {
+                    method: request.method,
+                    query:requestUrl.query,
+                    params: route.params,
+                    postData: postData
+                },
                 // Callback for writing to response
                 function(responseData){
                     response.write(responseData)
@@ -51,8 +87,12 @@ function handleRequest(request, response, routes) {
         })
     }
     else {
-        route(
-            requestUrl.query,
+        route.handler(
+            {
+                method: request.method,
+                query:requestUrl.query,
+                params: route.params
+            },
             // Callback for writing to response
             function(responseData){
                 response.write(responseData)

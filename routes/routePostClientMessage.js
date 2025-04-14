@@ -1,16 +1,16 @@
 let Channels = require('../Channels')
 let message = require('../message/message');
 
-function routePostClientMessage(query, postData, writeResponse, routeCompleted) {
+function routePostClientMessage(routeData, writeResponse, routeCompleted) {
 
     Channels.sendMessageToClient(
-        postData.channel,
-        postData.client,
+        routeData.postData.channel,
+        routeData.postData.client,
         message(
-            postData.message_type,
-            postData.message,
-            postData.payload,
-            postData.payload_type
+            routeData.postData.message_type,
+            routeData.postData.message,
+            routeData.postData.payload,
+            routeData.postData.payload_type
         )
     );
 

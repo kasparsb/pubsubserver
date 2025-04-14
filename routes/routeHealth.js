@@ -1,4 +1,4 @@
-function routeHealth(query, writeResponse, routeCompleted) {
+function routeHealth(routeData, writeResponse, routeCompleted) {
 
     writeResponse('Pubsub server is running\n');
 

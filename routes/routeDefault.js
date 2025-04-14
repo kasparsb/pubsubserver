@@ -1,5 +1,5 @@
-function routeDefault(query, writeResponse, routeCompleted) {
-    writeResponse('pubsub');
+function routeDefault(routeData, writeResponse, routeCompleted) {
+    writeResponse(routeData.method+':pubsub');
     routeCompleted();
 }
 

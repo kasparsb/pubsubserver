@@ -1,4 +1,5 @@
 let Client = require('./Client');
+const Mysql = require('./Mysql');
 
 function Channel(dbRow) {
 
@@ -77,6 +78,29 @@ Channel.prototype = {
         let topicClients = this.topics.get(topic);
         topicClients.delete(client.id);
         this.topics.set(topic, topicClients);
+    },
+
+    /**
+     * Uzstādam endpoints, kuri tiks izsaukti, kad kanāla
+     * klientam mainās statuss
+     */
+    setClientStatusChangeListenerEndpoint(endpoints, cb) {
+
+        console.log('update endpoints');
+        console.log(endpoints);
+        cb();
+        return;
+
+        Mysql.update(
+            'channels',
+            {
+                listener_endpoints: endpoints
+            },
+            {
+                id: this.id
+            },
+            cb
+        )
     }
 }
 

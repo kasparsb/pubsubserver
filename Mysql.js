@@ -13,10 +13,10 @@ function insert(tableName, data, cb) {
         fields.push(field);
         let value = data[field];
         if (typeof  data[field] == 'object') {
-           value = JSON.stringify(value); 
+           value = JSON.stringify(value);
         }
         values.push(value);
-        valuesPlaceholders.push('?'); 
+        valuesPlaceholders.push('?');
     }
 
     let sql = 'INSERT INTO '+connection.escapeId(tableName)+' ('+fields.join(',')+') VALUES ('+valuesPlaceholders+')';
@@ -113,7 +113,7 @@ function connect(successCb) {
         host: '192.168.2.1',
         user: 'root',
         password: 'bbbbbbbb',
-        database: 'pubsub',
+        database: 'pubsub2',
         port: 3371
     });
 
