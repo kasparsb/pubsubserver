@@ -24,6 +24,9 @@ let routePostTopicMessage = require('./routes/routePostTopicMessage');
 let routePostSetClientStatusChangeListenerEndpoint = require('./routes/routePostSetClientStatusChangeListenerEndpoint');
 let routeGetChannels = require('./routes/routeGetChannels');
 let routeCreateChannels = require('./routes/routeCreateChannels');
+let routeChannel = require('./routes/routeChannel');
+let routeUpdateChannel = require('./routes/routeUpdateChannel');
+let routeDeleteChannel = require('./routes/routeDeleteChannel');
 
 // Socket actions
 let socketCanAcceptRequest = require('./socket/socketCanAcceptRequest');
@@ -57,10 +60,11 @@ function startServer() {
     // Admin routes
     Route.get('/channels', routeGetChannels)
     Route.post('/channels', routeCreateChannels);
-    Route.post('/channels/create', function(){});
-    Route.get('/channels/{channelId}', function(){});
+    Route.get('/channels/{channelId}', routeChannel);
+    Route.post('/channels/{channelId}', routeUpdateChannel);
+    Route.delete('/channels/{channelId}', routeDeleteChannel);
 
-    Route.post('/listener-endpoint/client-status-change', routePostSetClientStatusChangeListenerEndpoint);
+    Route.post('/channel-listener-endpoint/client-status-change', routePostSetClientStatusChangeListenerEndpoint);
 
     /**
      * TODO šo jāvāc ārā, jo kanāli tiks iesūtīti pa rest api
@@ -93,9 +97,9 @@ function startServer() {
 
 
 
-    // let socketServer = createSocketServer(server)
-    // socketServer.setCanAcceptRequestFunction(socketCanAcceptRequest)
-    // socketServer.setCreateClientFunction(socketCreateClient)
-    // socketServer.onMessage(socketOnMessage)
-    // socketServer.onClose(socketOnClose)
+    let socketServer = createSocketServer(server)
+    socketServer.setCanAcceptRequestFunction(socketCanAcceptRequest)
+    socketServer.setCreateClientFunction(socketCreateClient)
+    socketServer.onMessage(socketOnMessage)
+    socketServer.onClose(socketOnClose)
 }

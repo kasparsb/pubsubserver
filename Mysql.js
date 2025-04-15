@@ -48,6 +48,19 @@ function update(tableName, data, where, cb) {
     query(sql, values, cb);
 }
 
+function deleteRows(tableName, where, cb) {
+    let values = [];
+    // Where
+    let qw = [];
+    for (let field in where) {
+        qw.push(field+'=?');
+        values.push(where[field]);
+    }
+
+    let sql = 'DELETE FROM '+connection.escapeId(tableName)+' WHERE '+qw.join(' AND ');
+    query(sql, values, cb);
+}
+
 function insertOrUpdate(tableName, data, where, cb) {
     let qw = [];
     let qwv = []
@@ -141,6 +154,7 @@ module.exports = {
     query: query,
     insert: insert,
     update: update,
+    delete: deleteRows,
     insertOrUpdate: insertOrUpdate,
     now: function(){
         //return mysql.raw('CURRENT_TIMESTAMP()')

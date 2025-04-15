@@ -1,10 +1,12 @@
 let routes = new Map();
 routes.set('get', new Map());
 routes.set('post', new Map());
+routes.set('delete', new Map());
 
 // Default handlers
 routes.get('get').set('default', defaultRouteHandler);
 routes.get('post').set('default', defaultRouteHandler);
+routes.get('delete').set('default', defaultRouteHandler);
 
 function defaultRouteHandler(routeData, writeResponse, endResponse) {
     writeResponse(routeData.method+':default');
@@ -72,6 +74,9 @@ module.exports = {
     },
     post: function(pathname, cb) {
         routes.get('post').set(pathname, cb);
+    },
+    delete: function(pathname, cb) {
+        routes.get('delete').set(pathname, cb);
     },
     default: function(cb) {
         routes.get('get').set('default', cb);

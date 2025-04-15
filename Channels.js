@@ -45,6 +45,16 @@ function createOrUpdate(data, cb) {
     }
 }
 
+function deleteChannel(channelId, cb) {
+    Mysql.delete(
+        'channels',
+        {
+            id: channelId
+        },
+        cb
+    )
+}
+
 function loadFromDb(done) {
 
     Mysql.getRows('select * from channels', [], function(rows){
@@ -53,6 +63,10 @@ function loadFromDb(done) {
 
         done(rows);
     });
+}
+
+function find(channelId) {
+    return channels.find(channel => channel.id == channelId);
 }
 
 function findByName(channelName) {
@@ -136,9 +150,11 @@ function notifyListeners(channelName, eventName, message) {
 }
 
 module.exports = {
+    find: find,
     findByName: findByName,
     loadFromDb: loadFromDb,
     createOrUpdate: createOrUpdate,
+    delete: deleteChannel,
 
     connectClient: connectClient,
     getClient: getClient,
