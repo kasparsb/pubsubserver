@@ -63,7 +63,7 @@ function handleRequest(request, response, routes) {
     }, 5000)
 
     // POST
-    if (request.method == 'POST') {
+    if (request.method == 'POST' || request.method == 'DELETE') {
         onPostBody(request, postData => {
 
             route.handler(

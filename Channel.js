@@ -1,16 +1,54 @@
 let Client = require('./Client');
+let arrayUnique = require('./helpers/arrayUnique');
 const Mysql = require('./Mysql');
+
+function formatChannelFromDbRow(dbRow) {
+    let r = {
+        id: dbRow.id,
+        name: dbRow.name
+    }
+
+    let listenerEndpoints = JSON.parse(dbRow.listener_endpoints);
+
+    if (!listenerEndpoints) {
+        listenerEndpoints = {};
+    }
+
+    // Client status change. Kad mainās statuss, tad izsauks šos endpoints
+    if (!listenerEndpoints.client_status_change) {
+        // new Set(), jo čakarīgi konverēt uz json
+        listenerEndpoints.client_status_change = [];
+    }
+    /**
+     * TODO te vēl var pielikt citus listeners
+     */
+
+
+    r.listener_endpoints = listenerEndpoints;
+
+    return r;
+}
+
+function dbUpdate(channelId, data, cb) {
+    Mysql.update(
+        'channels',
+        data,
+        {
+            id: channelId
+        },
+        cb
+    )
+}
 
 function Channel(dbRow) {
 
-    this.id = dbRow.id;
-    this.name = dbRow.name;
-
-    this.data = dbRow;
+    this.data = formatChannelFromDbRow(dbRow);
 
     this.clients = new Map();
     // Katrs topic ir set of client ids
     this.topics = new Map();
+
+    this.listenerEndpoint = this.data.listener_endpoints;
 }
 
 Channel.prototype = {
@@ -80,27 +118,31 @@ Channel.prototype = {
         this.topics.set(topic, topicClients);
     },
 
-    /**
-     * Uzstādam endpoints, kuri tiks izsaukti, kad kanāla
-     * klientam mainās statuss
-     */
-    setClientStatusChangeListenerEndpoint(endpoints, cb) {
+    getClientStatusChangeListenerEndpoints() {
+        return this.listenerEndpoint.client_status_change;
+    },
 
-        console.log('update endpoints');
-        console.log(endpoints);
-        cb();
-        return;
+    appendClientStatusChangeListenerEndpoint(endpoint, cb) {
 
-        Mysql.update(
-            'channels',
-            {
-                listener_endpoints: endpoints
-            },
-            {
-                id: this.id
-            },
-            cb
-        )
+        this.listenerEndpoint.client_status_change.push(endpoint);
+        this.listenerEndpoint.client_status_change = arrayUnique(this.listenerEndpoint.client_status_change);
+
+        // Saglabājam datubāzē
+        dbUpdate(this.data.id, {
+            listener_endpoints: JSON.stringify(this.listenerEndpoint)
+        }, cb)
+    },
+
+    removeClientStatusChangeListenerEndpoint(endpoint, cb) {
+        let i = this.listenerEndpoint.client_status_change.indexOf(endpoint);
+        if (i >= 0) {
+            this.listenerEndpoint.client_status_change.splice(i, 1);
+        }
+
+        // Saglabājam datubāzē
+        dbUpdate(this.data.id, {
+            listener_endpoints: JSON.stringify(this.listenerEndpoint)
+        }, cb)
     }
 }
 

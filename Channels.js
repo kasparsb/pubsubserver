@@ -66,11 +66,11 @@ function loadFromDb(done) {
 }
 
 function find(channelId) {
-    return channels.find(channel => channel.id == channelId);
+    return channels.find(channel => channel.data.id == channelId);
 }
 
 function findByName(channelName) {
-    return channels.find(channel => channel.name == channelName);
+    return channels.find(channel => channel.data.name == channelName);
 }
 
 function connectClient(channelName, connection, data, deviceInfo) {
