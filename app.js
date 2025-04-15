@@ -21,7 +21,8 @@ let routeGetClientStatus = require('./routes/routeGetClientStatus');
 let routePostClientMessage = require('./routes/routePostClientMessage');
 let routePostChannelMessage = require('./routes/routePostChannelMessage');
 let routePostTopicMessage = require('./routes/routePostTopicMessage');
-let routePostSetClientStatusChangeListenerEndpoint = require('./routes/routePostSetClientStatusChangeListenerEndpoint');
+
+let routeSetChannelClientStatusChangeListenerEndpoint = require('./routes/routeSetChannelClientStatusChangeListenerEndpoint');
 let routeGetChannels = require('./routes/routeGetChannels');
 let routeCreateChannels = require('./routes/routeCreateChannels');
 let routeChannel = require('./routes/routeChannel');
@@ -64,7 +65,7 @@ function startServer() {
     Route.post('/channels/{channelId}', routeUpdateChannel);
     Route.delete('/channels/{channelId}', routeDeleteChannel);
 
-    Route.post('/channel-listener-endpoint/client-status-change', routePostSetClientStatusChangeListenerEndpoint);
+    Route.post('/channel-listener-endpoint/client-status-change', routeSetChannelClientStatusChangeListenerEndpoint);
 
     /**
      * TODO šo jāvāc ārā, jo kanāli tiks iesūtīti pa rest api

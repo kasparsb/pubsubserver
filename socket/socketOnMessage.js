@@ -20,6 +20,10 @@ let messageMessage = require('../message/message');
  * }
  */
 function socketOnMessage(client, message) {
+    if (!client) {
+        return;
+    }
+
     client.lastMessageAt = timer();
 
     let data = null;

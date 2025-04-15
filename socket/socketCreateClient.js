@@ -1,11 +1,15 @@
-let ClientsList = require('../ClientsList')
 let Channels = require('../Channels')
 
 let messageStatus = require('../message/status');
 
 function socketCreateClient(request, connection) {
-    let client = Channels.connectClient(
-        request.resourceURL.query.channel,
+    let channel = Channels.findByName(request.resourceURL.query.channel)
+    if (!channel) {
+        console.log('CHANNEL NOT FOUND, Channel: '+request.resourceURL.query.channel);
+        return;
+    }
+
+    let client = channel.connectClient(
         connection,
         {
             ...request.resourceURL.query
