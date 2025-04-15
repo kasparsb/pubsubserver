@@ -1,6 +1,31 @@
+let axios = require('axios');
 let Client = require('./Client');
 let arrayUnique = require('./helpers/arrayUnique');
-const Mysql = require('./Mysql');
+let messageStatus = require('./message/status');
+let Mysql = require('./Mysql');
+
+/**
+ * Helper, makes http request with data
+ * Posts data to provided url
+ * Failed request is attempted one more time
+ */
+function send(url, message, tries) {
+    if (typeof tries == 'undefined') {
+        tries = 0;
+    }
+
+    if (tries++ > 2) {
+        return;
+    }
+
+    axios.post(url, message)
+        // .then(r => {
+        //     console.log(r.data);
+        // })
+        .catch(err => {
+            setTimeout(() => send(url, message, tries+1), 500)
+        })
+}
 
 function formatChannelFromDbRow(dbRow) {
     let r = {
@@ -58,6 +83,8 @@ Channel.prototype = {
         newClient.connect();
 
         this.clients.set(newClient.id, newClient);
+
+        this.notifyListeners('client_status_change', 'connect', newClient);
 
         return newClient;
     },
@@ -143,6 +170,13 @@ Channel.prototype = {
         dbUpdate(this.data.id, {
             listener_endpoints: JSON.stringify(this.listenerEndpoint)
         }, cb)
+    },
+
+    notifyListeners(listenersGroupName, clientStatus, client) {
+        this.listenerEndpoint[listenersGroupName]
+            .forEach(endpoint => {
+                send(endpoint, messageStatus(clientStatus, client))
+            })
     }
 }
 

@@ -2,11 +2,11 @@
  * Sūtam subscriber statusu
  * līdzi tiek sūtīts payload, kurā ir subscriber info
  */
-function status(status, subscriber) {
+function status(status, client) {
     return {
         type: 'status',
         status: status,
-        subscriber: subscriber.data
+        client: client.data
     }
 }
 

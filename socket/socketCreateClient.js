@@ -1,7 +1,5 @@
 let Channels = require('../Channels')
 
-let messageStatus = require('../message/status');
-
 function socketCreateClient(request, connection) {
     let channel = Channels.findByName(request.resourceURL.query.channel)
     if (!channel) {
@@ -26,11 +24,6 @@ function socketCreateClient(request, connection) {
     else {
         console.log('CANT CONNECT, channel: '+request.resourceURL.query.channel);
     }
-
-    // Channels.notifySubscriberStatusChange(
-    //     subscriber.channel,
-    //     messageStatus('connect', subscriber)
-    // );
 
     return client;
 }
