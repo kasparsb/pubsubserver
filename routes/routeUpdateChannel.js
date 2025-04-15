@@ -7,7 +7,7 @@ function routeUpdateChannel(routeData, writeResponse, routeCompleted) {
     data.id = routeData.params.channelId;
 
     if (data.id) {
-        Channels.createOrUpdate(routeData.postData, function(){
+        Channels.createOrUpdate(data, function(){
             routeCompleted();
         });
     }

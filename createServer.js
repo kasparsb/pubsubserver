@@ -12,20 +12,43 @@ function parsePostBody(body) {
     let params = new URLSearchParams(body);
 
     for (let [key, value] of params) {
-        // Check if the key contains array notation (e.g., field[0], field[1])
-        let arrayMatch = key.match(/^(.+)\[(\d+)\]$/);
+        // Match array notation with nested levels (e.g., level1[level2][level3])
+        let parts = key.split('[');
+        if (parts.length > 1) {
+            let current = r;
+            let lastIndex = parts.length - 1;
 
-        if (arrayMatch) {
-            let fieldName = arrayMatch[1];
-            let index = parseInt(arrayMatch[2]);
+            // Process each part of the key
+            parts.forEach((part, index) => {
+                // Remove closing bracket if present
+                let cleanKey = part.replace(']', '');
 
-            if (!Array.isArray(r[fieldName])) {
-                r[fieldName] = [];
-            }
+                // If not the last part, we need to create an object/array
+                if (index < lastIndex) {
+                    let nextPart = parts[index + 1].replace(']', '');
+                    let isNextNumeric = !isNaN(parseInt(nextPart));
 
-            r[fieldName][index] = value;
+                    // Create array if next part is numeric, otherwise object
+                    if (isNextNumeric) {
+                        if (!Array.isArray(current[cleanKey])) {
+                            current[cleanKey] = [];
+                        }
+                    }
+                    else {
+                        if (!current[cleanKey]) {
+                            current[cleanKey] = {};
+                        }
+                    }
+                    current = current[cleanKey];
+                }
+                else {
+                    // Last part - assign the value
+                    current[cleanKey] = value;
+                }
+            });
         }
         else {
+            // Simple key-value pair
             r[key] = value;
         }
     }

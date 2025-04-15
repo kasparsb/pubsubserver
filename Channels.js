@@ -26,6 +26,14 @@ function send(url, message, tries) {
 }
 
 function createOrUpdate(data, cb) {
+
+    // Filter
+    data.listener_endpoints.client_status_change = data.listener_endpoints.client_status_change.filter(value => value ? true : false);
+
+    if (typeof data.listener_endpoints != 'undefined') {
+        data.listener_endpoints = JSON.stringify(data.listener_endpoints);
+    }
+
     if (data.id) {
         Mysql.update(
             'channels',
