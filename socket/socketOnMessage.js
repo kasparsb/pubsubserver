@@ -1,9 +1,7 @@
 let Channels = require('../Channels');
-let Listeners = require('../Listeners');
 let timer = require('../timer');
 
 let messagePong = require('../message/pong');
-let messageMessage = require('../message/message');
 
 /**
  * Apstrādājam ienākošo socket message no client
@@ -60,33 +58,5 @@ function socketOnMessage(client, message) {
 
             break;
     }
-
-
-
-
-    // /**
-    //  * Special case, admin channel subscribers
-    //  * they can watch changes in
-    //  *      channelChange
-    //  *      subscriberChange
-    //  * @eventName channelChange|subscriberChange
-    //  * @subjects channel name or subscriber id
-    //  */
-    // else if (data.type == 'watch') {
-    //     Listeners.add(subscriber, data.eventName, data.subjects);
-    // }
-    // else if (data.type == 'unwatch') {
-    //     Listeners.remove(subscriber, data.eventName, data.subjects);
-    // }
-    // else if (data.type == 'unwatchall') {
-    //     Listeners.remove(subscriber);
-    // }
-    // else if (data.type == 'message') {
-    //     Channels.notifySubscriberMessageRecieved(
-    //         // Channel name
-    //         client.channel,
-    //         messageMessage(data.message, undefined, client)
-    //     );
-    // }
 }
 module.exports = socketOnMessage;

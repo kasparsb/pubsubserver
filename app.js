@@ -2,9 +2,7 @@
  * run npx supervisor app.js
  */
 let Mysql = require('./Mysql');
-let Redis = require('./Redis');
 
-let StateStore = require('./StateStore')
 let Channels = require('./Channels');
 
 let Route = require('./Route');
@@ -35,12 +33,8 @@ let socketOnClose = require('./socket/socketOnClose');
 
 const port = 80;
 
-Redis.connect(function(){
-    StateStore.cleanUp(function(){
-        Mysql.connect(function(){
-            Channels.loadFromDb(startServer)
-        })
-    })
+Mysql.connect(function(){
+    Channels.loadFromDb(startServer)
 })
 
 function startServer() {

@@ -2,33 +2,6 @@ let Redis = require('./Redis');
 let formatDate = require('./helpers/formatDate');
 
 /**
- * Iztīrām visus iepriekš reģistrētos channels
- * Tas notiek, kad app ielādējas, tad kanāls ir tukšs,
- * jo vēl nav neviens pieslēdzies.
- * Tāpēc izdzēšam visus iepriekš kanālā reģistrētos subscribers
- */
-function cleanUp(doneCb) {
-
-    // Scan through all previously registered channels and delete them
-    Redis.scan('channels', 100, function(channels){
-
-        let transaction = Redis.multi();
-        // Remove up channel SET
-        channels.forEach(channelId => {
-            transaction.DEL('channel:'+channelId)
-            transaction.DEL('channel:subscribers_count:'+channelId)
-        })
-        transaction.exec();
-
-    }, function(){
-        // Remove channels SET, so it will be empty
-        Redis.client().DEL('channels');
-
-        doneCb();
-    })
-}
-
-/**
  * Maintain SET of registered channels
  * When will be time to clean up state, then read
  * channels from this SET and clean up channels SET
@@ -38,7 +11,7 @@ function cleanUp(doneCb) {
  *
  * Every channel has its own SET channel+channe.id
  *     there will be stored all channel connected subscribers
- *
+ *FState
  */
 function addSubscriber(subscriber) {
     // Channels SET
@@ -93,7 +66,6 @@ function setChannelSubscribersCount(channel, subscribersCount) {
 }
 
 module.exports = {
-    cleanUp: cleanUp,
     updateSubscriberData: updateSubscriberData,
     addSubscriber: addSubscriber,
     removeSubscriber: removeSubscriber,
