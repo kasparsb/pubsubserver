@@ -2,6 +2,8 @@ let axios = require('axios');
 let Client = require('./Client');
 let arrayUnique = require('./helpers/arrayUnique');
 let messageStatus = require('./message/status');
+let timer = require('./timer');
+let formatDate = require('./helpers/formatDate');
 let Mysql = require('./Mysql');
 
 /**
@@ -19,10 +21,11 @@ function send(url, message, tries) {
     }
 
     axios.post(url, message)
-        // .then(r => {
-        //     console.log(r.data);
-        // })
+        .then(r => {
+            console.log(r.data);
+        })
         .catch(err => {
+            console.log('    cant send', err);
             setTimeout(() => send(url, message, tries+1), 500)
         })
 }
@@ -88,6 +91,21 @@ Channel.prototype = {
 
         return newClient;
     },
+    disconnectClient(client) {
+        /**
+         * Liekam pazīmi, ka disconnected
+         * Bet, ja gadījumā tomēr ienāk ziņa no client, tad
+         * liekam atpakaļ kā connected
+         *
+         * Tādu gadījumu, kad client nostrādā close, bet reāli ping
+         * nāk iekšā ir bijis
+         */
+        client.disconnectAt = timer();
+        client.status = 'disconnected';
+        client.disconnected_at = formatDate.ymdhis(new Date());
+
+        this.notifyListeners('client_status_change', 'disconnect', client);
+    },
     getClient(clientId) {
         return this.clients.get(clientId);
     },
@@ -143,6 +161,21 @@ Channel.prototype = {
         let topicClients = this.topics.get(topic);
         topicClients.delete(client.id);
         this.topics.set(topic, topicClients);
+    },
+
+    removeInactive() {
+        let clientsToRemove = [];
+        this.clients.forEach((client, clientId) => {
+            if (subscribers[i].disconnectAt && subscribers[i].disconnectAt.duration() > 40) {
+                clientsToRemove.push(clientId);
+            }
+        })
+
+        if (clientsToRemove.length) {
+            console.log('Remove inactive, channel '+this.data.name+', clients '+clientsToRemove.length);
+
+            clientsToRemove.forEach(clientId => this.clients.delete(clientId))
+        }
     },
 
     getClientStatusChangeListenerEndpoints() {

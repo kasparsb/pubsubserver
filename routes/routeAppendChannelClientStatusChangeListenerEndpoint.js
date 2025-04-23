@@ -8,6 +8,7 @@ function routeAppendChannelClientStatusChangeListenerEndpoint(routeData, writeRe
     let channel = Channels.find(routeData.postData.id);
     if (!channel) {
         routeCompleted();
+        return;
     }
 
     channel.appendClientStatusChangeListenerEndpoint(routeData.postData.endpoint, function(){

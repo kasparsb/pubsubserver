@@ -25,14 +25,20 @@ function createSocketServer(server, callbacks) {
         }
 
         let connection = request.accept(null, request.origin);
+
         let client = createClient(request, connection);
+        if (!client) {
+            connection.close();
+        }
 
         connection.on('message', function(message) {
             onMessage(client, message);
         })
 
         connection.on('close', function(reasonCode, description) {
-            onClose(client, reasonCode, description);
+            if (client) {
+                onClose(client, reasonCode, description);
+            }
         })
 
     })

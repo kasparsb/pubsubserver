@@ -11,6 +11,13 @@ function createOrUpdate(data, cb) {
      */
 
     // Filter
+    if (typeof data.listener_endpoints == 'undefined') {
+        data.listener_endpoints = {};
+    }
+    if (typeof data.listener_endpoints.client_status_change == 'undefined') {
+        data.listener_endpoints.client_status_change = [];
+    }
+
     data.listener_endpoints.client_status_change = data.listener_endpoints.client_status_change.filter(value => value ? true : false);
 
     if (typeof data.listener_endpoints != 'undefined') {
@@ -125,6 +132,13 @@ module.exports = {
     sendMessageToClient: sendMessageToClient,
     sendMessageToTopic: sendMessageToTopic,
     subscribeClientToTopics: subscribeClientToTopics,
+
+    // Intervāls kādā izvākt inactive
+    removeInactiveEverySeconds(seconds) {
+        setInterval(() => {
+            channels.forEach(channel => channel.removeInactive())
+        }, seconds * 1000)
+    },
 
     getChannels: function(){
         return channels;
